@@ -1,8 +1,10 @@
 #pragma once
 #include "PermMeta.hpp"
+#include "mc/deps/core/string/HashedString.h"
 #include "perm_core/infra/HashedStringView.hpp"
 
 #include <ll/api/Expected.h>
+#include <vector>
 
 namespace permc {
 struct PermMeta;
@@ -13,16 +15,12 @@ namespace permc {
 
 class PermRegistry {
     static std::unordered_map<HashedString, PermMeta, HashedStringHasher, HashedStringEqual> perms_;
+    static std::vector<HashedString>                                                         orderedKeys_;
 
     static ll::Expected<> registerImpl(HashedStringView key, PermMeta meta);
 
 public:
     PermRegistry() = delete;
-
-    template <typename Factory>
-    static void buildDefault(Factory&& factory) {
-        factory(perms_);
-    }
 
     static ll::Expected<> loadOverrides(std::filesystem::path const& path);
 
@@ -39,6 +37,8 @@ public:
 
     static bool getEnvDefault(HashedStringView key);
     static bool getRoleDefault(HashedStringView key, bool isMember);
+
+    static std::vector<HashedString> const& getOrderedKeys();
 };
 
 } // namespace permc

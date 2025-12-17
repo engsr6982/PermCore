@@ -4,7 +4,9 @@
 #include "ll/api/reflection/Deserialization.h"
 #include "ll/api/reflection/Serialization.h"
 #include <ll/api/io/FileUtils.h>
+#include <vector>
 
+#include "mc/deps/core/string/HashedString.h"
 #include "nlohmann/json.hpp"
 
 
@@ -16,7 +18,9 @@ ll::Expected<> PermRegistry::registerImpl(HashedStringView key, PermMeta meta) {
     if (perms_.contains(key)) {
         return ll::makeStringError(fmt::format("Perm already registered:{} ", key.getString()));
     }
-    perms_.emplace(key, std::move(meta));
+    if (perms_.emplace(key, std::move(meta)).second) {
+        orderedKeys_.emplace_back(key.getString());
+    }
     return {};
 }
 ll::Expected<> PermRegistry::loadOverrides(std::filesystem::path const& path) {
@@ -70,7 +74,10 @@ ll::Expected<> PermRegistry::ensureOverrides() {
     }
     return {};
 }
-void           PermRegistry::clear() { perms_.clear(); }
+void PermRegistry::clear() {
+    perms_.clear();
+    orderedKeys_.clear();
+}
 ll::Expected<> PermRegistry::registerPerm(HashedStringView key, PermCategory cat, bool defMember, bool defGuest) {
     assert(cat != PermCategory::Environment);
     return registerImpl(key, PermMeta::make(cat, defMember, defGuest));
@@ -96,5 +103,6 @@ bool PermRegistry::getRoleDefault(HashedStringView key, bool isMember) {
         .and_then([&isMember](PermMeta& meta) { return isMember ? meta.defValue.member : meta.defValue.guest; })
         .value_or(false);
 }
+std::vector<HashedString> const& PermRegistry::getOrderedKeys() { return orderedKeys_; }
 
 } // namespace permc
