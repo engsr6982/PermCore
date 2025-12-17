@@ -70,6 +70,7 @@ ll::Expected<> PermRegistry::ensureOverrides() {
     }
     return {};
 }
+void           PermRegistry::clear() { perms_.clear(); }
 ll::Expected<> PermRegistry::registerPerm(HashedStringView key, PermCategory cat, bool defMember, bool defGuest) {
     assert(cat != PermCategory::Environment);
     return registerImpl(key, PermMeta::make(cat, defMember, defGuest));

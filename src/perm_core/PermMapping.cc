@@ -39,6 +39,7 @@ ll::Expected<> PermMapping::loadUserExtension(std::filesystem::path const& path)
         return ll::makeStringError(exception.what());
     }
 }
+void                             PermMapping::clear() { mapping_.clear(); }
 optional_ref<const HashedString> PermMapping::lookup(std::string_view typeName) {
     auto it = mapping_.find(typeName);
     if (it != mapping_.end()) {

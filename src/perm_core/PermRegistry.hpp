@@ -28,6 +28,8 @@ public:
 
     static ll::Expected<> ensureOverrides();
 
+    static void clear();
+
     // 角色权限
     static ll::Expected<> registerPerm(HashedStringView key, PermCategory cat, bool defMember, bool defGuest);
     // 环境权限

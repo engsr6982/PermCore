@@ -23,6 +23,8 @@ struct PermMapping {
 
     static ll::Expected<> loadUserExtension(std::filesystem::path const& path);
 
+    static void clear();
+
     static optional_ref<const HashedString> lookup(std::string_view typeName);
 
 private:
