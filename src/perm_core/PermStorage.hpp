@@ -4,6 +4,7 @@
 
 #include <ll/api/Expected.h>
 
+#include <type_traits>
 #include <unordered_map>
 
 namespace permc {
@@ -24,5 +25,6 @@ public:
 
     bool resolve(HashedStringView key, TargetField target) const;
 };
+static_assert(std::is_aggregate_v<PermStorage>);
 
 } // namespace permc
