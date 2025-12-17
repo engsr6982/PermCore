@@ -32,8 +32,8 @@ target("PermCore") -- Change this to your mod name.
     set_kind("static")
     set_languages("c++20")
     set_symbols("debug")
-    add_headerfiles("src/(perm_core/**.h)")
-    add_files("src/**.cpp")
+    add_headerfiles("src/(perm_core/**.hpp)")
+    add_files("src/**.cc")
     add_includedirs("src")
     -- if is_config("target_type", "server") then
     --     add_includedirs("src-server")
