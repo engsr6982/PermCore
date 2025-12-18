@@ -1,5 +1,5 @@
 #pragma once
-#include "PermMeta.hpp"
+#include "RolePermMeta.hpp"
 #include "perm_core/infra/HashedStringView.hpp"
 
 #include <ll/api/Expected.h>
@@ -14,16 +14,22 @@ namespace permc {
  */
 class PermStorage {
 public:
-    std::unordered_map<HashedString, PermMeta::ValueEntry, HashedStringHasher, HashedStringEqual> data;
+    struct RoleSparseStorage {
+        std::optional<bool> member;
+        std::optional<bool> guest;
+    };
+
+    std::unordered_map<HashedString, bool, HashedStringHasher, HashedStringEqual>              environment;
+    std::unordered_map<HashedString, RoleSparseStorage, HashedStringHasher, HashedStringEqual> roles;
 
     ll::Expected<> ensureData();
 
-    optional_ref<const PermMeta::ValueEntry> get(HashedStringView key) const;
+    std::optional<RoleSparseStorage> get(HashedStringView key) const;
 
-    enum class TargetField { Global, Member, Guest };
+    enum class TargetField { Environment, Member, Guest };
     void set(HashedStringView key, bool value, TargetField target);
 
-    bool resolve(HashedStringView key, TargetField target) const;
+    std::optional<bool> resolve(HashedStringView key, TargetField target) const;
 };
 static_assert(std::is_aggregate_v<PermStorage>);
 

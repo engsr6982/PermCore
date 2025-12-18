@@ -13,14 +13,22 @@ class HashedStringView {
 public:
     constexpr HashedStringView() noexcept : hash_(0), str_("") {}
     consteval HashedStringView(const char* str) noexcept : hash_(HashedString::computeHash(str)), str_(str) {}
-    consteval HashedStringView(std::string_view str) noexcept : hash_(HashedString::computeHash(str)), str_(str) {}
+    HashedStringView(std::string_view str) noexcept : hash_(HashedString::computeHash(str)), str_(str) {}
     HashedStringView(HashedString const& str) noexcept : hash_(str.getHash()), str_(str.getString()) {}
 
     [[nodiscard]] constexpr uint64_t         getHash() const noexcept { return hash_; }
     [[nodiscard]] constexpr std::string_view getString() const noexcept { return str_; }
     [[nodiscard]] constexpr const char*      c_str() const noexcept { return str_.data(); }
 
-    [[nodiscard]] constexpr bool operator==(HashedStringView const& rhs) const noexcept { return hash_ == rhs.hash_; }
+    [[nodiscard]] constexpr bool operator==(HashedStringView const& rhs) const noexcept {
+        if (hash_ != rhs.hash_) return false;
+#ifndef NDEBUG
+        if (!str_.empty() && !rhs.str_.empty()) {
+            assert(str_ == rhs.str_ && "HashedStringView hash collision");
+        }
+#endif
+        return true;
+    }
 
     [[nodiscard]] constexpr std::strong_ordering operator<=>(HashedStringView const& rhs) const noexcept {
         return hash_ <=> rhs.hash_;
@@ -28,10 +36,6 @@ public:
 
     [[nodiscard]] constexpr operator std::string_view() const noexcept { return str_; }
 };
-
-consteval HashedStringView operator""_hsv(const char* str, std::size_t len) {
-    return {std::string_view(str, len)};
-}
 
 struct HashedStringHasher {
     using is_transparent = void;

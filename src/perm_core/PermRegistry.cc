@@ -1,30 +1,24 @@
 #include "PermRegistry.hpp"
-#include "PermMeta.hpp"
+#include "RolePermMeta.hpp"
 
 #include "ll/api/reflection/Deserialization.h"
 #include "ll/api/reflection/Serialization.h"
 #include <ll/api/io/FileUtils.h>
-#include <vector>
 
 #include "mc/deps/core/string/HashedString.h"
+
 #include "nlohmann/json.hpp"
 
+#include <vector>
 
 namespace permc {
 
-decltype(PermRegistry::perms_) PermRegistry::perms_{};
+decltype(PermRegistry::data_)            PermRegistry::data_{};
+decltype(PermRegistry::envOrderedKeys_)  PermRegistry::envOrderedKeys_{};
+decltype(PermRegistry::roleOrderedKeys_) PermRegistry::roleOrderedKeys_{};
 
-ll::Expected<> PermRegistry::registerImpl(HashedStringView key, PermMeta meta) {
-    if (perms_.contains(key)) {
-        return ll::makeStringError(fmt::format("Perm already registered:{} ", key.getString()));
-    }
-    if (perms_.emplace(key, std::move(meta)).second) {
-        orderedKeys_.emplace_back(key.getString());
-    }
-    return {};
-}
 ll::Expected<> PermRegistry::loadOverrides(std::filesystem::path const& path) {
-    auto defaultJson = ll::reflection::serialize<nlohmann::json>(perms_);
+    auto defaultJson = ll::reflection::serialize<nlohmann::json>(data_);
     if (!defaultJson) {
         return ll::makeStringError(defaultJson.error().message());
     }
@@ -44,65 +38,56 @@ ll::Expected<> PermRegistry::loadOverrides(std::filesystem::path const& path) {
     try {
         auto json = nlohmann::json::parse(*rawJson);
         defaultJson->merge_patch(json);
-        if (auto expected = ll::reflection::deserialize(perms_, defaultJson.value()); !expected) {
+        if (auto expected = ll::reflection::deserialize(data_, defaultJson.value()); !expected) {
             return expected;
         }
-        return ensureOverrides();
+        return {};
     } catch (nlohmann::json::exception const& exception) {
         return ll::makeStringError(exception.what());
     }
 }
-ll::Expected<> PermRegistry::ensureOverrides() {
-    for (auto& [key, meta] : perms_) {
-        auto& valueSet = meta.defValue;
-        switch (meta.scope) {
-        case PermMeta::Scope::Global:
-            if (valueSet.guest || valueSet.member) {
-                return ll::makeStringError(
-                    fmt::format("Global scope permission '{}' cannot have 'member' or 'guest' value", key.getString())
-                );
-            }
-            break;
-        case PermMeta::Scope::Role:
-            if (valueSet.global) {
-                return ll::makeStringError(
-                    fmt::format("Role scope permission '{}' cannot have 'global' value", key.getString())
-                );
-            }
-            break;
-        }
-    }
-    return {};
-}
 void PermRegistry::clear() {
-    perms_.clear();
-    orderedKeys_.clear();
+    data_.environment.clear();
+    data_.roles.clear();
+    envOrderedKeys_.clear();
+    roleOrderedKeys_.clear();
 }
 ll::Expected<> PermRegistry::registerPerm(HashedStringView key, PermCategory cat, bool defMember, bool defGuest) {
-    assert(cat != PermCategory::Environment);
-    return registerImpl(key, PermMeta::make(cat, defMember, defGuest));
+    if (data_.roles.contains(key)) {
+        return ll::makeStringError(fmt::format("perm already registered: {}", key.getString()));
+    }
+    data_.roles.emplace(key.getString(), RolePermMeta::make(cat, defMember, defGuest));
+    roleOrderedKeys_.emplace_back(key.getString());
+    return {};
 }
-ll::Expected<> PermRegistry::registerPerm(HashedStringView key, PermCategory cat, bool defVal) {
-    assert(cat == PermCategory::Environment);
-    return registerImpl(key, PermMeta::make(cat, defVal));
+ll::Expected<> PermRegistry::registerPerm(HashedStringView key, bool defVal) {
+    if (data_.environment.contains(key)) {
+        return ll::makeStringError(fmt::format("perm already registered: {}", key.getString()));
+    }
+    data_.environment.emplace(key.getString(), defVal);
+    envOrderedKeys_.emplace_back(key.getString());
+    return {};
 }
-optional_ref<PermMeta> PermRegistry::getMeta(HashedStringView key) {
-    auto iter = perms_.find(key);
-    if (iter == perms_.end()) {
+optional_ref<RolePermMeta> PermRegistry::getRoleMeta(HashedStringView key) {
+    auto iter = data_.roles.find(key);
+    if (iter == data_.roles.end()) {
         return {};
     }
     return {iter->second};
 }
-bool PermRegistry::getEnvDefault(HashedStringView key) {
-    return getMeta(key).and_then(
-                           [](PermMeta& meta) -> std::optional<bool> { return meta.defValue.global; }
-    ).value_or(false);
+std::optional<bool> PermRegistry::getEnvDefault(HashedStringView key) {
+    auto iter = data_.environment.find(key);
+    if (iter == data_.environment.end()) {
+        return std::nullopt;
+    }
+    return iter->second;
 }
-bool PermRegistry::getRoleDefault(HashedStringView key, bool isMember) {
-    return getMeta(key)
-        .and_then([&isMember](PermMeta& meta) { return isMember ? meta.defValue.member : meta.defValue.guest; })
-        .value_or(false);
+std::optional<bool> PermRegistry::getRoleDefault(HashedStringView key, bool isMember) {
+    return getRoleMeta(key).transform([&isMember](RolePermMeta& meta) {
+        return isMember ? meta.defValue.member : meta.defValue.guest;
+    });
 }
-std::vector<HashedString> const& PermRegistry::getOrderedKeys() { return orderedKeys_; }
+std::vector<HashedString> const& PermRegistry::getEnvOrderedKeys() { return envOrderedKeys_; }
+std::vector<HashedString> const& PermRegistry::getRoleOrderedKeys() { return roleOrderedKeys_; }
 
 } // namespace permc
