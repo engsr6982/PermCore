@@ -1,7 +1,7 @@
 #include "PermGUI.hpp"
+#include "perm_core/gui/PermGUI.hpp"
 #include "perm_core/model/PermRegistry.hpp"
 #include "perm_core/model/RolePermMeta.hpp"
-#include "perm_core/gui/PermGUI.hpp"
 
 #include "ll/api/form/CustomForm.h"
 #include "ll/api/form/SimpleForm.h"
@@ -87,7 +87,7 @@ void PermGUI::sendEditView(
         }
     } else {
         std::optional<PermCategory> lastCategory{std::nullopt};
-        for (auto& key : PermRegistry::getEnvOrderedKeys()) {
+        for (auto& key : PermRegistry::getRoleOrderedKeys()) {
             if (auto meta = PermRegistry::getRolePermMeta(key)) {
                 if (meta->category != lastCategory) {
                     lastCategory = meta->category;
