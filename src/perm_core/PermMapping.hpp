@@ -25,6 +25,9 @@ struct PermMapping {
 
     static void clear();
 
+    // TODO: 考虑方块多权限映射问题
+    static void add(AnyTypeName typeName, PermKey key);
+
     static optional_ref<const HashedString> lookup(std::string_view typeName);
 
 private:

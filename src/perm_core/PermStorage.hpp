@@ -29,6 +29,7 @@ public:
     enum class TargetField { Environment, Member, Guest };
     void set(HashedStringView key, bool value, TargetField target);
 
+    // true: pass, false: deny, none: undefined(continue)
     std::optional<bool> resolve(HashedStringView key, TargetField target) const;
 };
 static_assert(std::is_aggregate_v<PermStorage>);
