@@ -75,10 +75,16 @@ ll::Expected<> PermStorage::setEnvironment(HashedStringView key, bool value) {
     if (!def) {
         return ll::makeStringError("unregistered key");
     }
+    auto iter = environment.find(key);
     if (def.value() == value) {
-        return {}; // 和默认值相同，不存储
+        // 新值和默认值相同，不存储
+        if (iter != environment.end()) {
+            environment.erase(iter); // 存储了不同值，擦除
+        }
+        return {};
     }
-    environment.emplace(key.getString(), value);
+    // 新值和默认值不同，存储
+    environment.insert_or_assign(key.getString(), value);
     return {};
 }
 ll::Expected<> PermStorage::setMemberRole(HashedStringView key, bool value) {
@@ -86,10 +92,14 @@ ll::Expected<> PermStorage::setMemberRole(HashedStringView key, bool value) {
     if (!def) {
         return ll::makeStringError("unregistered key");
     }
-    if (def.value() == value) {
-        return {}; // 和默认值相同，不存储
-    }
     auto iter = roles.find(key);
+    if (def.value() == value) {
+        // 新值和默认值相同，不存储
+        if (iter != roles.end()) {
+            iter->second.member.reset(); // 清理
+        }
+        return {};
+    }
     if (iter == roles.end()) {
         roles.emplace(key.getString(), RoleSparseStorage{.member = value}); // 新建节点
         return {};
@@ -102,10 +112,14 @@ ll::Expected<> PermStorage::setGuestRole(HashedStringView key, bool value) {
     if (!def) {
         return ll::makeStringError("unregistered key");
     }
-    if (def.value() == value) {
-        return {}; // 和默认值相同，不存储
-    }
     auto iter = roles.find(key);
+    if (def.value() == value) {
+        // 新值和默认值相同，不存储
+        if (iter != roles.end()) {
+            iter->second.guest.reset(); // 清理
+        }
+        return {};
+    }
     if (iter == roles.end()) {
         roles.emplace(key.getString(), RoleSparseStorage{.guest = value}); // 新建节点
         return {};
