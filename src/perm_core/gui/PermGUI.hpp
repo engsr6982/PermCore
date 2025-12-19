@@ -9,25 +9,25 @@ class Player;
 
 namespace permc {
 
-struct ResourceProvider {
-    virtual ~ResourceProvider() = default;
-    using Ptr                   = std::shared_ptr<ResourceProvider>; // form callback need to be copyable
-
-    virtual std::string  getLocaleCode(Player& player)                                  = 0;
-    virtual PermStorage& getStorage(Player& player)                                     = 0;
-};
-
 struct PermGUI {
     PermGUI() = delete;
 
+    using PermStorageProvider = std::function<PermStorage&(Player&)>;
+
     //             / env   \
-    // entry ---> |  member | -> submit
+    // entry ---> |  member | -> save
     //             \ guest /
 
-    static void sendTo(Player& player, ResourceProvider::Ptr provider, std::function<void(Player&)> onBack = nullptr);
+    static void sendTo(
+        Player&                      player,
+        std::string                  localeCode,
+        PermStorageProvider          provider,
+        std::function<void(Player&)> onBack = nullptr
+    );
 
-    static void sendEditView(Player& player, PermStorage::TargetField targetField, ResourceProvider::Ptr provider);
+    enum class EditTarget { Environment, Member, Guest };
+    static void
+    sendEditView(Player& player, EditTarget targetField, std::string localeCode, PermStorageProvider provider);
 };
-
 
 } // namespace permc

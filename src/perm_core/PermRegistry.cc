@@ -68,22 +68,22 @@ ll::Expected<> PermRegistry::registerPerm(HashedStringView key, bool defVal) {
     envOrderedKeys_.emplace_back(key.getString());
     return {};
 }
-optional_ref<RolePermMeta> PermRegistry::getRoleMeta(HashedStringView key) {
+optional_ref<RolePermMeta> PermRegistry::getRolePermMeta(HashedStringView key) {
     auto iter = data_.roles.find(key);
     if (iter == data_.roles.end()) {
-        return {};
+        return {}; // not found
     }
     return {iter->second};
 }
-std::optional<bool> PermRegistry::getEnvDefault(HashedStringView key) {
+std::optional<bool> PermRegistry::defaultOf(HashedStringView key) {
     auto iter = data_.environment.find(key);
     if (iter == data_.environment.end()) {
         return std::nullopt;
     }
     return iter->second;
 }
-std::optional<bool> PermRegistry::getRoleDefault(HashedStringView key, bool isMember) {
-    return getRoleMeta(key).transform([&isMember](RolePermMeta& meta) {
+std::optional<bool> PermRegistry::defaultOf(HashedStringView key, bool isMember) {
+    return getRolePermMeta(key).transform([&isMember](RolePermMeta& meta) {
         return isMember ? meta.defValue.member : meta.defValue.guest;
     });
 }

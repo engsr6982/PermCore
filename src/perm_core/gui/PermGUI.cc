@@ -1,6 +1,7 @@
-#include "perm_core/gui/PermGUI.hpp"
+#include "PermGUI.hpp"
 #include "perm_core/PermRegistry.hpp"
 #include "perm_core/RolePermMeta.hpp"
+#include "perm_core/gui/PermGUI.hpp"
 
 #include "ll/api/form/CustomForm.h"
 #include "ll/api/form/SimpleForm.h"
@@ -17,18 +18,22 @@
 namespace permc {
 
 using ll::i18n_literals::operator""_trl;
-void PermGUI::sendTo(Player& player, ResourceProvider::Ptr provider, std::function<void(Player&)> onBack) {
-    auto f          = ll::form::SimpleForm{};
-    auto localeCode = provider->getLocaleCode(player);
+void PermGUI::sendTo(
+    Player&                      player,
+    std::string                  localeCode,
+    PermStorageProvider          provider,
+    std::function<void(Player&)> onBack
+) {
+    auto f = ll::form::SimpleForm{};
     f.setTitle("Perm - 权限管理"_trl(localeCode));
-    f.appendButton("全局权限"_trl(localeCode), [provider](Player& player) {
-        sendEditView(player, PermStorage::TargetField::Environment, provider);
+    f.appendButton("全局权限"_trl(localeCode), [localeCode, provider](Player& player) {
+        sendEditView(player, EditTarget::Environment, localeCode, provider);
     });
-    f.appendButton("成员权限"_trl(localeCode), [provider](Player& player) {
-        sendEditView(player, PermStorage::TargetField::Member, provider);
+    f.appendButton("成员权限"_trl(localeCode), [localeCode, provider](Player& player) {
+        sendEditView(player, EditTarget::Member, localeCode, provider);
     });
-    f.appendButton("游客权限"_trl(localeCode), [provider](Player& player) {
-        sendEditView(player, PermStorage::TargetField::Guest, provider);
+    f.appendButton("游客权限"_trl(localeCode), [localeCode, provider](Player& player) {
+        sendEditView(player, EditTarget::Guest, localeCode, provider);
     });
     if (onBack) {
         f.appendButton("返回"_trl(localeCode), [onBack](Player& player) { onBack(player); });
@@ -36,38 +41,54 @@ void PermGUI::sendTo(Player& player, ResourceProvider::Ptr provider, std::functi
     f.sendTo(player);
 }
 
-void PermGUI::sendEditView(Player& player, PermStorage::TargetField targetField, ResourceProvider::Ptr provider) {
-    auto f          = ll::form::CustomForm();
-    auto localeCode = provider->getLocaleCode(player);
+void PermGUI::sendEditView(
+    Player&             player,
+    EditTarget          targetField,
+    std::string         localeCode,
+    PermStorageProvider provider
+) {
+    auto f = ll::form::CustomForm();
 
     switch (targetField) {
-    case PermStorage::TargetField::Environment:
+    case EditTarget::Environment:
         f.setTitle("Perm - 全局权限管理"_trl(localeCode));
         break;
-    case PermStorage::TargetField::Member:
+    case EditTarget::Member:
         f.setTitle("Perm - 成员权限管理"_trl(localeCode));
         break;
-    case PermStorage::TargetField::Guest:
+    case EditTarget::Guest:
         f.setTitle("Perm - 游客权限管理"_trl(localeCode));
         break;
     }
 
     auto& i18n         = ll::i18n::getInstance();
-    auto  storage      = provider->getStorage(player);
+    auto& storage      = provider(player);
     auto  appendToggle = [&](HashedString const& key) {
-        if (auto value = storage.resolve(key, targetField)) {
-            f.appendToggle(key, std::string{i18n.get(key, localeCode)}, value.value());
+        std::optional<bool> value;
+        switch (targetField) {
+        case EditTarget::Environment:
+            value = storage.resolveEnvironment(key);
+            break;
+        case EditTarget::Member:
+            value = storage.resolveRole(key, true);
+            break;
+        case EditTarget::Guest:
+            value = storage.resolveRole(key, false);
+            break;
+        }
+        if (value) {
+            f.appendToggle(key, std::string{i18n.get(key, localeCode)}, *value);
         }
     };
 
-    if (targetField == PermStorage::TargetField::Environment) {
+    if (targetField == EditTarget::Environment) {
         for (auto& key : PermRegistry::getEnvOrderedKeys()) {
             appendToggle(key);
         }
     } else {
         std::optional<PermCategory> lastCategory{std::nullopt};
         for (auto& key : PermRegistry::getEnvOrderedKeys()) {
-            if (auto meta = PermRegistry::getRoleMeta(key)) {
+            if (auto meta = PermRegistry::getRolePermMeta(key)) {
                 if (meta->category != lastCategory) {
                     lastCategory = meta->category;
                     f.appendDivider();
@@ -85,11 +106,21 @@ void PermGUI::sendEditView(Player& player, PermStorage::TargetField targetField,
             if (!data) {
                 return;
             }
-            auto storage = pr->getStorage(player);
+            auto& storage = pr(player);
             for (auto& [key, variant] : *data) {
                 bool             val = std::get<uint64_t>(variant);
                 HashedStringView keyView{key};
-                storage.set(keyView, val, targetField);
+                switch (targetField) {
+                case EditTarget::Environment:
+                    storage.setEnvironment(keyView, val);
+                    break;
+                case EditTarget::Member:
+                    storage.setMemberRole(keyView, val);
+                    break;
+                case EditTarget::Guest:
+                    storage.setGuestRole(keyView, val);
+                    break;
+                }
             }
         }
     );
