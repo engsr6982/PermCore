@@ -1,6 +1,6 @@
 #include "PermGUI.hpp"
-#include "perm_core/PermRegistry.hpp"
-#include "perm_core/RolePermMeta.hpp"
+#include "perm_core/model/PermRegistry.hpp"
+#include "perm_core/model/RolePermMeta.hpp"
 #include "perm_core/gui/PermGUI.hpp"
 
 #include "ll/api/form/CustomForm.h"
