@@ -1,9 +1,7 @@
 #pragma once
-#include "perm_core/PermKeys.hpp"
 #include "perm_core/interceptor/InterceptorDelegate.hpp"
 #include "perm_core/interceptor/InterceptorHelper.hpp"
 #include "perm_core/interceptor/PermInterceptor.hpp"
-#include "perm_core/model/PermStorage.hpp"
 
 #include "ll/api/event/world/FireSpreadEvent.h"
 
@@ -20,11 +18,10 @@ void PermInterceptor::registerWorldInterceptor(ListenerConfig const& config) {
             return;
         }
 
-        auto value = delegate.getStorage(blockSource, pos).and_then([](PermStorage& storage) {
-            return storage.resolveEnvironment(keys::allowFireSpread);
-        });
-        if (applyDecision(value, ev)) {
-            return;
+        if (auto table = delegate.getPermTable(blockSource, pos)) {
+            if (applyDecision(table->environment.allowFireSpread, ev)) {
+                return;
+            }
         }
 
         applyDecision(delegate.postPolicy(blockSource, pos), ev);

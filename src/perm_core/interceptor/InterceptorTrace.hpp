@@ -1,11 +1,9 @@
 #pragma once
 #include "PermInterceptor.hpp"
 
-#include "fmt/format-inl.h"
 #include "fmt/format.h"
 
 #include <iosfwd>
-#include <optional>
 
 
 namespace permc {

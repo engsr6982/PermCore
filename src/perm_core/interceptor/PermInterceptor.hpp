@@ -1,6 +1,5 @@
 #pragma once
 #include "InterceptorDelegate.hpp"
-#include "perm_core/model/RolePermMeta.hpp"
 
 #include <ll/api/event/Event.h>
 #include <ll/api/event/EventBus.h>

@@ -23,6 +23,9 @@ target("PermCore") -- Change this to your mod name.
     add_files("src/**.cc")
     add_includedirs("src")
     add_defines("FMT_HEADER_ONLY=1") -- fix ODR errors
+    if is_mode("debug") then
+        add_defines("PERMC_DEBUG")
+    end
 
 target("PermCoreTest")
     set_default(false)

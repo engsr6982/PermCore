@@ -9,9 +9,7 @@
 #include "ll/api/command/runtime/RuntimeOverload.h"
 #include "ll/api/mod/RegisterHelper.h"
 
-#include "perm_core/DefaultInitializer.hpp"
 #include "perm_core/interceptor/InterceptorDelegate.hpp"
-#include "perm_core/model/PermStorage.hpp"
 
 #include "nlohmann/json.hpp"
 #include "perm_core/gui/PermGUI.hpp"
@@ -19,7 +17,7 @@
 namespace test {
 
 static permc::PermRole     gRole{permc::PermRole::Gust};
-static permc::PermStorage  gStorage{};
+static permc::PermTable    gPermTable{};
 static permc::PermDecision gPreDecision{permc::PermDecision::Abstain};
 static permc::PermDecision gPostDecision{permc::PermDecision::Allow};
 
@@ -28,10 +26,10 @@ struct MyInterceptorDelegate final : public permc::InterceptorDelegate {
     permc::PermRole     getRole(Player& player, BlockSource& blockSource, const BlockPos& blockPos) override {
         return gRole;
     }
-    optional_ref<permc::PermStorage> getStorage(BlockSource& blockSource, const BlockPos& blockPos) override {
-        return gStorage;
-    }
     permc::PermDecision postPolicy(BlockSource& blockSource, const BlockPos& vec3) override { return gPostDecision; }
+    optional_ref<permc::PermTable> getPermTable(BlockSource& blockSource, const BlockPos& blockPos) override {
+        return gPermTable;
+    }
 };
 
 TestMod& TestMod::getInstance() {
@@ -41,12 +39,12 @@ TestMod& TestMod::getInstance() {
 
 bool TestMod::load() {
 
-    if (auto exp = permc::DefaultInitializer::initRegistry(getSelf().getConfigDir() / "PermOverrides.json"); !exp) {
-        exp.error().log(getSelf().getLogger());
-    }
-    if (auto exp = permc::DefaultInitializer::initMapping(getSelf().getConfigDir() / "PermMapping.json"); !exp) {
-        exp.error().log(getSelf().getLogger());
-    }
+    // if (auto exp = permc::DefaultInitializer::initRegistry(getSelf().getConfigDir() / "PermOverrides.json"); !exp) {
+    //     exp.error().log(getSelf().getLogger());
+    // }
+    // if (auto exp = permc::DefaultInitializer::initMapping(getSelf().getConfigDir() / "PermMapping.json"); !exp) {
+    //     exp.error().log(getSelf().getLogger());
+    // }
 
     return true;
 }
@@ -105,9 +103,12 @@ bool TestMod::enable() {
             return;
         }
         auto player = static_cast<Player*>(entity);
-        permc::PermGUI::sendTo(*player, player->getLocaleCode(), [](Player&) -> permc::PermStorage& {
-            return gStorage;
-        });
+        permc::PermGUI::sendTo(
+            *player,
+            player->getLocaleCode(),
+            gPermTable,
+            [](Player& player, permc::PermTable newTable) { gPermTable = std::move(newTable); }
+        );
     });
 
 

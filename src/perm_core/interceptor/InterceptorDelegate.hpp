@@ -1,5 +1,6 @@
 #pragma once
 #include "perm_core/model/PermRole.hpp"
+#include "perm_core/model/PermTable.hpp"
 
 #include <mc/deps/core/utility/optional_ref.h>
 
@@ -8,9 +9,6 @@ class BlockPos;
 class Player;
 class BlockSource;
 class Vec3;
-namespace permc {
-class PermStorage;
-}
 
 namespace permc {
 
@@ -27,7 +25,7 @@ struct InterceptorDelegate {
 
     virtual PermRole getRole(Player& player, BlockSource& blockSource, BlockPos const& blockPos) = 0;
 
-    virtual optional_ref<PermStorage> getStorage(BlockSource& blockSource, BlockPos const& blockPos) = 0;
+    virtual optional_ref<PermTable> getPermTable(BlockSource& blockSource, BlockPos const& blockPos) = 0;
 
     virtual PermDecision postPolicy(BlockSource& blockSource, BlockPos const& vec3) = 0;
 };

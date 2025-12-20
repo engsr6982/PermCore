@@ -2,7 +2,6 @@
 #include "InterceptorDelegate.hpp"
 #include "InterceptorTrace.hpp"
 #include "perm_core/model/PermRole.hpp"
-#include "perm_core/model/RolePermMeta.hpp"
 
 #include <ll/api/event/Event.h>
 #include <ll/api/event/EventBus.h>
@@ -31,13 +30,8 @@ inline static bool applyDecision(PermDecision decision, T& event) {
     [[unlikely]] throw std::runtime_error("PermDecision::applyDecision: invalid decision");
 }
 
-// nullopt => Abstain; true => Allow; false => Deny
-inline static PermDecision asDecision(std::optional<bool> result) {
-    if (!result.has_value()) {
-        return PermDecision::Abstain;
-    }
-    return *result ? PermDecision::Allow : PermDecision::Deny;
-}
+// true => Allow; false => Deny
+#define asDecision(BOOL_V) (BOOL_V ? PermDecision::Allow : PermDecision::Deny)
 
 template <std::derived_from<ll::event::Event> T>
 inline static bool applyDecision(std::optional<bool> result, T& event) {
@@ -55,10 +49,10 @@ inline static bool applyPrivilege(PermRole role, T& event) {
 }
 
 template <std::derived_from<ll::event::Event> T>
-inline static bool applyRoleInterceptor(PermRole role, std::optional<RolePermMeta::RoleEntry> entry, T& event) {
+inline static bool applyRoleInterceptor(PermRole role, RolePerms::Entry entry, T& event) {
     TRACE_STEP_T(T, "applyRoleInterceptor", role);
-    if (entry && !applyPrivilege(role, event)) {
-        return applyDecision(role == PermRole::Member ? entry->member : entry->guest, event);
+    if (!applyPrivilege(role, event)) {
+        return applyDecision(role == PermRole::Member ? entry.member : entry.guest, event);
     }
     return false;
 }

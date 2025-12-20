@@ -1,55 +1,44 @@
 #include "PermGUI.hpp"
-#include "perm_core/gui/PermGUI.hpp"
-#include "perm_core/model/PermRegistry.hpp"
-#include "perm_core/model/RolePermMeta.hpp"
+#include "perm_core/model/PermManager.hpp"
 
 #include "ll/api/form/CustomForm.h"
 #include "ll/api/form/SimpleForm.h"
 #include "ll/api/i18n/I18n.h"
+#include <ll/api/reflection/Deserialization.h>
+#include <ll/api/reflection/Serialization.h>
 
 #include "mc/world/actor/player/Player.h"
 
-#include "magic_enum.hpp"
-
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <optional>
 #include <string>
 
 namespace permc {
 
 using ll::i18n_literals::operator""_trl;
-void PermGUI::sendTo(
-    Player&                      player,
-    std::string                  localeCode,
-    PermStorageProvider          provider,
-    std::function<void(Player&)> onBack
-) {
+void PermGUI::sendTo(Player& player, DataCtx::Ptr ctx) {
+    auto& localeCode = ctx->localeCode;
+
     auto f = ll::form::SimpleForm{};
     f.setTitle("Perm - 权限管理"_trl(localeCode));
-    f.appendButton("全局权限"_trl(localeCode), [localeCode, provider](Player& player) {
-        sendEditView(player, EditTarget::Environment, localeCode, provider);
+    f.appendButton("环境权限"_trl(localeCode), [ctx](Player& player) {
+        sendEditView(player, EditTarget::Environment, ctx);
     });
-    f.appendButton("成员权限"_trl(localeCode), [localeCode, provider](Player& player) {
-        sendEditView(player, EditTarget::Member, localeCode, provider);
+    f.appendButton("成员权限"_trl(localeCode), [ctx](Player& player) {
+        sendEditView(player, EditTarget::Member, ctx);
     });
-    f.appendButton("游客权限"_trl(localeCode), [localeCode, provider](Player& player) {
-        sendEditView(player, EditTarget::Guest, localeCode, provider);
-    });
-    if (onBack) {
-        f.appendButton("返回"_trl(localeCode), [onBack](Player& player) { onBack(player); });
-    }
+    f.appendButton("游客权限"_trl(localeCode), [ctx](Player& player) { sendEditView(player, EditTarget::Guest, ctx); });
+    if (ctx->back) f.appendButton("返回"_trl(localeCode), [ctx](Player& player) { ctx->back(player); });
     f.sendTo(player);
 }
 
-void PermGUI::sendEditView(
-    Player&             player,
-    EditTarget          targetField,
-    std::string         localeCode,
-    PermStorageProvider provider
-) {
-    auto f = ll::form::CustomForm();
+void PermGUI::sendEditView(Player& player, EditTarget target, DataCtx::Ptr ctx) {
+    auto& localeCode = ctx->localeCode;
+    auto& i18n       = ll::i18n::getInstance();
 
-    switch (targetField) {
+    auto f = ll::form::CustomForm();
+    switch (target) {
     case EditTarget::Environment:
         f.setTitle("Perm - 全局权限管理"_trl(localeCode));
         break;
@@ -61,66 +50,68 @@ void PermGUI::sendEditView(
         break;
     }
 
-    auto& i18n         = ll::i18n::getInstance();
-    auto& storage      = provider(player);
-    auto  appendToggle = [&](HashedString const& key) {
-        std::optional<bool> value;
-        switch (targetField) {
+    // 转储为 json
+    auto fields = nlohmann::json::object();
+    if (target == EditTarget::Environment) {
+        fields = ll::reflection::serialize<nlohmann::json>(ctx->table.environment).value();
+    } else {
+        fields = ll::reflection::serialize<nlohmann::json>(ctx->table.role).value();
+    }
+
+    static_assert(std::same_as<std::remove_const_t<decltype(std::declval<RolePerms::Entry>().member)>, bool>);
+    static_assert(std::same_as<std::remove_const_t<decltype(std::declval<RolePerms::Entry>().guest)>, bool>);
+    for (auto& [k, v] : fields.items()) {
+        bool value = false;
+        switch (target) {
         case EditTarget::Environment:
-            value = storage.resolveEnvironment(key);
+            value = v.get<bool>();
             break;
         case EditTarget::Member:
-            value = storage.resolveRole(key, true);
+            value = v["member"].get<bool>();
             break;
         case EditTarget::Guest:
-            value = storage.resolveRole(key, false);
+            value = v["guest"].get<bool>();
             break;
         }
-        if (value) {
-            f.appendToggle(key, std::string{i18n.get(key, localeCode)}, *value);
-        }
-    };
-
-    if (targetField == EditTarget::Environment) {
-        for (auto& key : PermRegistry::getEnvOrderedKeys()) {
-            appendToggle(key);
-        }
-    } else {
-        std::optional<PermCategory> lastCategory{std::nullopt};
-        for (auto& key : PermRegistry::getRoleOrderedKeys()) {
-            if (auto meta = PermRegistry::getRolePermMeta(key)) {
-                if (meta->category != lastCategory) {
-                    lastCategory = meta->category;
-                    f.appendDivider();
-                    f.appendLabel("§e==> {}§r"_trl(localeCode, magic_enum::enum_name(*lastCategory)));
-                }
-            }
-            appendToggle(key);
-        }
+        f.appendToggle(k, std::string{i18n.get(k, localeCode)}, value);
     }
 
     f.sendTo(
         player,
-        [pr = std::move(provider),
-         targetField](Player& player, ll::form::CustomFormResult const& data, ll::form::FormCancelReason) {
+        [target, ctx, fields = std::move(fields)](
+            Player&                           player,
+            ll::form::CustomFormResult const& data,
+            ll::form::FormCancelReason
+        ) mutable {
             if (!data) {
                 return;
             }
-            auto& storage = pr(player);
-            for (auto& [key, variant] : *data) {
-                bool             val = std::get<uint64_t>(variant);
-                HashedStringView keyView{key};
-                switch (targetField) {
+
+            // 更新上一步的数据
+            for (auto& [k, v] : fields.items()) {
+                bool newVal = std::get<uint64_t>(data->at(k));
+                switch (target) {
                 case EditTarget::Environment:
-                    storage.setEnvironment(keyView, val);
+                    v = newVal;
                     break;
                 case EditTarget::Member:
-                    storage.setMemberRole(keyView, val);
+                    v["member"] = newVal;
                     break;
                 case EditTarget::Guest:
-                    storage.setGuestRole(keyView, val);
+                    v["guest"] = newVal;
                     break;
                 }
+            }
+
+            // 反序列化回结构体
+            if (target == EditTarget::Environment) {
+                ll::reflection::deserialize(ctx->table.environment, fields).value();
+            } else {
+                ll::reflection::deserialize(ctx->table.role, fields).value();
+            }
+
+            if (ctx->submit) {
+                ctx->submit(player, ctx->table);
             }
         }
     );

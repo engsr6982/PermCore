@@ -1,10 +1,7 @@
 #pragma once
-#include "perm_core/PermKeys.hpp"
 #include "perm_core/interceptor/InterceptorHelper.hpp"
 #include "perm_core/interceptor/InterceptorTrace.hpp"
 #include "perm_core/interceptor/PermInterceptor.hpp"
-#include "perm_core/model/PermMapping.hpp"
-#include "perm_core/model/PermStorage.hpp"
 
 #include "ll/api/event/player/PlayerDestroyBlockEvent.h"
 
@@ -34,11 +31,10 @@ void PermInterceptor::registerPlayerInterceptor(ListenerConfig const& config) {
             return;
         }
 
-        auto entry = delegate.getStorage(blockSource, pos).and_then([](PermStorage& storage) {
-            return storage.resolveRole(keys::allowDestroy);
-        });
-        if (applyRoleInterceptor(role, entry, ev)) {
-            return;
+        if (auto table = delegate.getPermTable(blockSource, pos)) {
+            if (applyRoleInterceptor(role, table->role.allowDestroy, ev)) {
+                return;
+            }
         }
 
         applyDecision(delegate.postPolicy(blockSource, pos), ev);
