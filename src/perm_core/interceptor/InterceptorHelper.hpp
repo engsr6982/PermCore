@@ -17,11 +17,7 @@ namespace permc {
  */
 template <std::derived_from<ll::event::Event> T>
 inline static bool applyDecision(PermDecision decision, T& event) {
-#ifdef PERMC_INTERCEPTOR_TRACE
-    if (GlobalInterceptorTraceRef<T> != nullptr) {
-        GlobalInterceptorTraceRef<T>->step("applyDecision", decision);
-    }
-#endif
+    TRACE_STEP_T(T, "applyDecision", decision);
     switch (decision) {
     case PermDecision::Abstain:
         return false;
@@ -51,13 +47,16 @@ inline static bool applyDecision(std::optional<bool> result, T& event) {
 template <std::derived_from<ll::event::Event> T>
 inline static bool applyPrivilege(PermRole role, T& event) {
     if (role == PermRole::Admin || role == PermRole::Owner) {
+        TRACE_STEP_T(T, "applyPrivilege", role, "pass");
         return true;
     }
+    TRACE_STEP_T(T, "applyPrivilege", role, "fail");
     return false;
 }
 
 template <std::derived_from<ll::event::Event> T>
 inline static bool applyRoleInterceptor(PermRole role, std::optional<RolePermMeta::RoleEntry> entry, T& event) {
+    TRACE_STEP_T(T, "applyRoleInterceptor", role);
     if (entry && !applyPrivilege(role, event)) {
         return applyDecision(role == PermRole::Member ? entry->member : entry->guest, event);
     }

@@ -44,6 +44,12 @@ struct InterceptorTrace {
     void step(std::string_view name, E val) {
         oss << "  [Step] " << name << ": " << magic_enum::enum_name(val) << "\n";
     }
+
+    template <typename E>
+        requires std::is_enum_v<E>
+    void step(std::string_view name, E val, std::string_view state) {
+        oss << "  [Step] " << name << ": " << magic_enum::enum_name(val) << " => " << state << "\n";
+    }
 };
 
 #ifdef PERMC_INTERCEPTOR_TRACE
@@ -54,6 +60,9 @@ struct InterceptorTrace {
 #define TRACE_STEP_PRE_CHECK(DECISION)  TRACE_STEP("preCheck", DECISION)
 #define TRACE_STEP_ROLE(ROLE)           TRACE_STEP("role", ROLE)
 
+#define TRACE_STEP_T(T, ...)                                                                                           \
+    if (GlobalInterceptorTraceRef<T> != nullptr) GlobalInterceptorTraceRef<T>->step(__VA_ARGS__)
+
 #else
 
 #define TRACE_THIS_EVENT(EVENT)         /* nothing */
@@ -61,6 +70,7 @@ struct InterceptorTrace {
 #define TRACE_STEP(STEP_NAME, DECISION) /* nothing */
 #define TRACE_STEP_PRE_CHECK(DECISION)  /* nothing */
 #define TRACE_STEP_ROLE(ROLE)           /* nothing */
+#define TRACE_STEP_T(T, ...)            /* nothing */
 
 #endif
 
