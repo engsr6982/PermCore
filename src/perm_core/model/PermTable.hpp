@@ -6,42 +6,42 @@ namespace permc {
 
 
 struct EnvironmentPerms final {
-  bool allowFireSpread; // 火焰蔓延
+    bool allowFireSpread; // 火焰蔓延
 };
 
 struct RolePerms final {
-  struct Entry final {
-    bool member;
-    bool guest;
-  };
-  Entry allowDestroy{};        // 允许破坏方块
-  Entry allowPlace{};          // 允许放置方块
-  Entry useBucket{};           // 允许使用桶(水/岩浆/...)
-  Entry allowAxePeeled{};      // 允许斧头去皮
-  Entry useHoe{};              // 允许使用锄头
-  Entry useShovel{};           // 允许使用铲子
-  Entry placeBoat{};           // 允许放置船
-  Entry placeMinecart{};       // 允许放置矿车
-  Entry useButton{};           // 允许使用按钮
-  Entry useDoor{};             // 允许使用门
-  Entry useFenceGate{};        // 允许使用栅栏门
-  Entry allowInteractEntity{}; // 允许与实体交互
-  Entry useTrapdoor{};         // 允许使用活板门
-  Entry editSign{};            // 允许编辑告示牌
-  Entry useShulkerBox{};       // 允许使用潜影盒
-  Entry useCraftingTable{};    // 允许使用工作台
-  Entry useLever{};            // 允许使用拉杆 // TODO: 拉杆、按钮合并为 useRedstoneComponent ?
-  Entry useFurnaces{};         // 允许使用所有熔炉类方块（熔炉、高炉、烟熏炉）
+    struct Entry final {
+        bool member;
+        bool guest;
+    };
+    Entry allowDestroy{};        // 允许破坏方块
+    Entry allowPlace{};          // 允许放置方块
+    Entry useBucket{};           // 允许使用桶(水/岩浆/...)
+    Entry allowAxePeeled{};      // 允许斧头去皮
+    Entry useHoe{};              // 允许使用锄头
+    Entry useShovel{};           // 允许使用铲子
+    Entry placeBoat{};           // 允许放置船
+    Entry placeMinecart{};       // 允许放置矿车
+    Entry useButton{};           // 允许使用按钮
+    Entry useDoor{};             // 允许使用门
+    Entry useFenceGate{};        // 允许使用栅栏门
+    Entry allowInteractEntity{}; // 允许与实体交互
+    Entry useTrapdoor{};         // 允许使用活板门
+    Entry editSign{};            // 允许编辑告示牌
+    Entry useShulkerBox{};       // 允许使用潜影盒
+    Entry useCraftingTable{};    // 允许使用工作台
+    Entry useLever{};            // 允许使用拉杆 // TODO: 拉杆、按钮合并为 useRedstoneComponent ?
+    Entry useFurnaces{};         // 允许使用所有熔炉类方块（熔炉、高炉、烟熏炉）
 
-  // 废弃字段（PLand v0.17.0)
-  [[deprecated("useFurnaces")]] Entry useBlastFurnace{}; // 允许使用熔炉
-  [[deprecated("useFurnaces")]] Entry useFurnace{};      // 允许使用熔炉
-  [[deprecated("useFurnaces")]] Entry useSmoker{};       // 允许使用烟熏炉
+    // 废弃字段（PLand v0.17.0)
+    [[deprecated("useFurnaces")]] Entry useBlastFurnace{}; // 允许使用熔炉
+    [[deprecated("useFurnaces")]] Entry useFurnace{};      // 允许使用熔炉
+    [[deprecated("useFurnaces")]] Entry useSmoker{};       // 允许使用烟熏炉
 };
 
 struct PermTable final {
-  RolePerms        role;
-  EnvironmentPerms environment;
+    RolePerms        role;
+    EnvironmentPerms environment;
 };
 
 static_assert(std::is_aggregate_v<PermTable>, "Reflection depends on aggregate types");
@@ -58,16 +58,19 @@ struct IsValidPermField<RolePerms::Entry> : std::true_type {};
 
 template <typename T>
 consteval void staticCheckPermFields() {
-  static_assert(ll::reflection::is_reflectable_v<T>, "T must be reflectable");
-  T t{};
-  ll::reflection::forEachMember(t, [](auto, auto field) {
-    using FieldT = decltype(field);
-    if constexpr (ll::reflection::is_reflectable_v<FieldT>) {
-      staticCheckPermFields<FieldT>();
-    } else {
-      static_assert(IsValidPermField<FieldT>::value, "PermTable contains invalid field type! Must be bool or Entry.");
-    }
-  });
+    static_assert(ll::reflection::is_reflectable_v<T>, "T must be reflectable");
+    T t{};
+    ll::reflection::forEachMember(t, [](auto, auto field) {
+        using FieldT = decltype(field);
+        if constexpr (ll::reflection::is_reflectable_v<FieldT>) {
+            staticCheckPermFields<FieldT>();
+        } else {
+            static_assert(
+                IsValidPermField<FieldT>::value,
+                "PermTable contains invalid field type! Must be bool or Entry."
+            );
+        }
+    });
 }
 inline constexpr bool PermTableStaticCheck = (staticCheckPermFields<PermTable>(), true);
 
