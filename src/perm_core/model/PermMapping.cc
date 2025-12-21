@@ -1,4 +1,4 @@
-#include "PermManager.hpp"
+#include "PermMapping.hpp"
 #include "PermTable.hpp"
 
 #include "ll/api/reflection/Deserialization.h"
@@ -14,7 +14,7 @@
 namespace permc {
 
 
-struct PermManager::Impl {
+struct PermMapping::Impl {
     std::unordered_map<PermFieldName, size_t> const fieldOffset_;  // 1. 权限字段 => 权限表中的偏移量
     std::unordered_map<TypeName, PermFieldName>     typeMapping_;  // 2. TypeName => 权限字段
     std::unordered_map<TypeName, size_t>            finalMapping_; // 3. TypeName => 权限表中的偏移量
@@ -56,13 +56,13 @@ struct PermManager::Impl {
     }
 };
 
-PermManager::PermManager() : impl_(std::make_unique<Impl>()) {}
-PermManager::~PermManager() = default;
-PermManager& PermManager::get() {
-    static PermManager instance;
+PermMapping::PermMapping() : impl_(std::make_unique<Impl>()) {}
+PermMapping::~PermMapping() = default;
+PermMapping& PermMapping::get() {
+    static PermMapping instance;
     return instance;
 }
-ll::Expected<> PermManager::initTypeNameMapping(std::filesystem::path const& path) {
+ll::Expected<> PermMapping::initTypeNameMapping(std::filesystem::path const& path) {
     initDefaultMapping();
     if (auto exp = loadMapping(path); !exp) {
         return exp;
@@ -72,7 +72,7 @@ ll::Expected<> PermManager::initTypeNameMapping(std::filesystem::path const& pat
     }
     return compileFinalMapping();
 }
-std::optional<size_t> PermManager::lookup(TypeName const& typeName) const {
+std::optional<size_t> PermMapping::lookup(TypeName const& typeName) const {
     if (auto it = impl_->finalMapping_.find(typeName); it != impl_->finalMapping_.end()) {
         return it->second;
     }
@@ -85,13 +85,13 @@ std::optional<size_t> PermManager::lookup(TypeName const& typeName) const {
         "Please synchronize the '" #FIELD "' field in the mapping table"                                               \
     );
 
-void PermManager::initDefaultMapping() {
+void PermMapping::initDefaultMapping() {
     impl_->typeMapping_.clear();
     impl_->typeMapping_ = {
         // TODO: PlayerAttackEvent => allowPlayerDamage/allowHostileDamage/allowFriendlyDamage/allowNeutralDamage
     };
 }
-ll::Expected<> PermManager::loadMapping(std::filesystem::path const& path) {
+ll::Expected<> PermMapping::loadMapping(std::filesystem::path const& path) {
     auto defaultJson = ll::reflection::serialize<nlohmann::json>(impl_->typeMapping_);
     if (!defaultJson) {
         return ll::makeStringError(defaultJson.error().message());
@@ -120,7 +120,7 @@ ll::Expected<> PermManager::loadMapping(std::filesystem::path const& path) {
         return ll::makeStringError(exception.what());
     }
 }
-ll::Expected<> PermManager::ensureMapping() {
+ll::Expected<> PermMapping::ensureMapping() {
     InvalidPermFieldNameError::InvalidPermFieldNames invalidNames;
 
     for (auto const& [typeName, fieldName] : impl_->typeMapping_) {
@@ -135,7 +135,7 @@ ll::Expected<> PermManager::ensureMapping() {
 
     return {};
 }
-ll::Expected<> PermManager::compileFinalMapping() {
+ll::Expected<> PermMapping::compileFinalMapping() {
     for (auto const& [typeName, fieldName] : impl_->typeMapping_) {
         auto iter = impl_->fieldOffset_.find(fieldName);
         if (iter != impl_->fieldOffset_.end()) {

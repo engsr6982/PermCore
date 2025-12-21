@@ -2,7 +2,7 @@
 #include "perm_core/interceptor/InterceptorHelper.hpp"
 #include "perm_core/interceptor/InterceptorTrace.hpp"
 #include "perm_core/interceptor/PermInterceptor.hpp"
-#include "perm_core/model/PermManager.hpp"
+#include "perm_core/model/PermMapping.hpp"
 
 #include "ll/api/event/player/PlayerAttackEvent.h"
 #include "ll/api/event/player/PlayerDestroyBlockEvent.h"
@@ -136,7 +136,7 @@ void PermInterceptor::registerPlayerInterceptor(ListenerConfig const& config) {
                     }
                 }
                 // fallback
-                if (auto entry = PermManager::get().lookup<RolePerms::Entry>(ev.item().getTypeName(), table)) {
+                if (auto entry = PermMapping::get().lookup<RolePerms::Entry>(ev.item().getTypeName(), table)) {
                     if (applyRoleInterceptor(role, *entry, ev)) {
                         return;
                     }
@@ -168,7 +168,7 @@ void PermInterceptor::registerPlayerInterceptor(ListenerConfig const& config) {
                         if (applyRoleInterceptor(role, table->role.useFurnaces, ev)) return;
                     }
                     // fallback
-                    if (auto entry = PermManager::get().lookup<RolePerms::Entry>(block->getTypeName().data(), table)) {
+                    if (auto entry = PermMapping::get().lookup<RolePerms::Entry>(block->getTypeName().data(), table)) {
                         if (applyRoleInterceptor(role, *entry, ev)) {
                             return;
                         }
@@ -208,7 +208,7 @@ void PermInterceptor::registerPlayerInterceptor(ListenerConfig const& config) {
             }
 
             if (auto table = delegate.getPermTable(blockSource, pos)) {
-                if (auto entry = PermManager::get().lookup<RolePerms::Entry>(actor.getTypeName().data(), table)) {
+                if (auto entry = PermMapping::get().lookup<RolePerms::Entry>(actor.getTypeName().data(), table)) {
                     if (applyRoleInterceptor(role, *entry, ev)) return;
                 }
             }

@@ -8,12 +8,12 @@ class HashedString;
 
 namespace permc {
 
-class PermManager final {
+class PermMapping final {
 public:
     using TypeName      = HashedString;
     using PermFieldName = HashedString;
 
-    static PermManager& get();
+    static PermMapping& get();
 
     // init -> load -> ensure -> compile
     ll::Expected<> initTypeNameMapping(std::filesystem::path const& path);
@@ -36,19 +36,19 @@ private:
     ll::Expected<> compileFinalMapping();
 
 private:
-    explicit PermManager();
-    ~PermManager();
-    PermManager(PermManager const&)            = delete;
-    PermManager& operator=(PermManager const&) = delete;
-    PermManager(PermManager&&)                 = delete;
-    PermManager& operator=(PermManager&&)      = delete;
+    explicit PermMapping();
+    ~PermMapping();
+    PermMapping(PermMapping const&)            = delete;
+    PermMapping& operator=(PermMapping const&) = delete;
+    PermMapping(PermMapping&&)                 = delete;
+    PermMapping& operator=(PermMapping&&)      = delete;
 
     struct Impl;
     std::unique_ptr<Impl> impl_;
 };
 
 struct InvalidPermFieldNameError final : ll::ErrorInfoBase {
-    using InvalidPermFieldNames = std::vector<PermManager::PermFieldName>;
+    using InvalidPermFieldNames = std::vector<PermMapping::PermFieldName>;
     InvalidPermFieldNames invalidPermFieldNames;
 
     InvalidPermFieldNameError(InvalidPermFieldNames invalidPermFieldNames);

@@ -1,5 +1,5 @@
 #include "PermGUI.hpp"
-#include "perm_core/model/PermManager.hpp"
+#include "perm_core/model/PermMapping.hpp"
 
 #include "ll/api/form/CustomForm.h"
 #include "ll/api/form/SimpleForm.h"

@@ -13,7 +13,7 @@
 
 #include "nlohmann/json.hpp"
 #include "perm_core/gui/PermGUI.hpp"
-#include "perm_core/model/PermManager.hpp"
+#include "perm_core/model/PermMapping.hpp"
 
 namespace test {
 
@@ -39,7 +39,7 @@ TestMod& TestMod::getInstance() {
 }
 
 bool TestMod::load() {
-    if (auto exp = permc::PermManager::get().initTypeNameMapping(getSelf().getConfigDir() / "PermMapping.json"); !exp) {
+    if (auto exp = permc::PermMapping::get().initTypeNameMapping(getSelf().getConfigDir() / "PermMapping.json"); !exp) {
         exp.error().log(getSelf().getLogger());
     }
 
