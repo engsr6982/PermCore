@@ -50,7 +50,7 @@ inline static bool applyPrivilege(PermRole role, T& event) {
 
 template <std::derived_from<ll::event::Event> T>
 inline static bool applyRoleInterceptor(PermRole role, RolePerms::Entry entry, T& event) {
-    TRACE_STEP_T(T, "applyRoleInterceptor", role);
+    TRACE_SCOPE_T(T, "applyRoleInterceptor");
     if (!applyPrivilege(role, event)) {
         return applyDecision(role == PermRole::Member ? entry.member : entry.guest, event);
     }
