@@ -32,11 +32,6 @@ struct RolePerms final {
     Entry useCraftingTable{};    // 允许使用工作台
     Entry useLever{};            // 允许使用拉杆 // TODO: 拉杆、按钮合并为 useRedstoneComponent ?
     Entry useFurnaces{};         // 允许使用所有熔炉类方块（熔炉、高炉、烟熏炉）
-
-    // 废弃字段（PLand v0.17.0)
-    [[deprecated("useFurnaces")]] Entry useBlastFurnace{}; // 允许使用熔炉
-    [[deprecated("useFurnaces")]] Entry useFurnace{};      // 允许使用熔炉
-    [[deprecated("useFurnaces")]] Entry useSmoker{};       // 允许使用烟熏炉
 };
 
 struct PermTable final {
