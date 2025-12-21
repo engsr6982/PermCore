@@ -1,8 +1,6 @@
 #pragma once
 #include "InterceptorDelegate.hpp"
 
-#include <ll/api/event/Event.h>
-#include <ll/api/event/EventBus.h>
 #include <ll/api/event/ListenerBase.h>
 
 #include <memory>
@@ -32,7 +30,9 @@ class PermInterceptor final {
 
 public:
     struct ListenerConfig {
-        bool PlayerDestroyBlockEvent = true;
+        bool PlayerDestroyBlockEvent  = true;
+        bool PlayerPlacingBlockEvent  = true;
+        bool PlayerInteractBlockEvent = true;
 
         // env
         bool FireSpreadEvent = true;
@@ -44,14 +44,7 @@ public:
     [[nodiscard]] InterceptorDelegate&       getDelegate();
     [[nodiscard]] InterceptorDelegate const& getDelegate() const;
 
-    template <std::derived_from<ll::event::Event> T>
-    void registerListenerIf(bool cond, std::function<void(T&)>&& callback) {
-        if (cond) {
-            auto listener = ll::event::EventBus::getInstance().emplaceListener<T>(std::move(callback));
-            this->registerListener(std::move(listener));
-        }
-    }
-
+    void registerListenerIf(bool cond, std::function<ll::event::ListenerPtr()> factory);
 
 private:
     void registerListener(ll::event::ListenerPtr listener);

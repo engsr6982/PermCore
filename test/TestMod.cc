@@ -13,6 +13,7 @@
 
 #include "nlohmann/json.hpp"
 #include "perm_core/gui/PermGUI.hpp"
+#include "perm_core/model/PermManager.hpp"
 
 namespace test {
 
@@ -38,13 +39,9 @@ TestMod& TestMod::getInstance() {
 }
 
 bool TestMod::load() {
-
-    // if (auto exp = permc::DefaultInitializer::initRegistry(getSelf().getConfigDir() / "PermOverrides.json"); !exp) {
-    //     exp.error().log(getSelf().getLogger());
-    // }
-    // if (auto exp = permc::DefaultInitializer::initMapping(getSelf().getConfigDir() / "PermMapping.json"); !exp) {
-    //     exp.error().log(getSelf().getLogger());
-    // }
+    if (auto exp = permc::PermManager::get().initTypeNameMapping(getSelf().getConfigDir() / "PermMapping.json"); !exp) {
+        exp.error().log(getSelf().getLogger());
+    }
 
     return true;
 }

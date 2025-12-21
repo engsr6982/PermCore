@@ -36,7 +36,7 @@ BreakBeforeBinaryOperators: NonAssignment
 ColumnLimit: 120
 CommentPragmas: '^ IWYU pragma:'
 ConstructorInitializerIndentWidth: 0
-IndentWidth: 4
+IndentWidth: 2
 Language: Cpp
 MaxEmptyLinesToKeep: 2
 PackConstructorInitializers: CurrentLine

@@ -8,23 +8,27 @@
 namespace permc {
 
 void PermInterceptor::registerWorldInterceptor(ListenerConfig const& config) {
-    registerListenerIf<ll::event::FireSpreadEvent>(config.FireSpreadEvent, [&](auto& ev) {
-        auto& blockSource = ev.blockSource();
-        auto& pos         = ev.pos();
+    registerListenerIf(config.FireSpreadEvent, [&]() {
+        return ll::event::EventBus::getInstance().emplaceListener<ll::event::FireSpreadEvent>(
+            [&](ll::event::FireSpreadEvent& ev) {
+                auto& blockSource = ev.blockSource();
+                auto& pos         = ev.pos();
 
-        auto& delegate = getDelegate();
-        auto  result   = delegate.preCheck(blockSource, pos);
-        if (applyDecision(result, ev)) {
-            return;
-        }
+                auto& delegate = getDelegate();
+                auto  result   = delegate.preCheck(blockSource, pos);
+                if (applyDecision(result, ev)) {
+                    return;
+                }
 
-        if (auto table = delegate.getPermTable(blockSource, pos)) {
-            if (applyDecision(table->environment.allowFireSpread, ev)) {
-                return;
+                if (auto table = delegate.getPermTable(blockSource, pos)) {
+                    if (applyDecision(table->environment.allowFireSpread, ev)) {
+                        return;
+                    }
+                }
+
+                applyDecision(delegate.postPolicy(blockSource, pos), ev);
             }
-        }
-
-        applyDecision(delegate.postPolicy(blockSource, pos), ev);
+        );
     });
 }
 

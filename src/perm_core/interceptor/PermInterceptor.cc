@@ -24,7 +24,13 @@ PermInterceptor::~PermInterceptor() {
 }
 InterceptorDelegate&       PermInterceptor::getDelegate() { return *impl->delegate; }
 InterceptorDelegate const& PermInterceptor::getDelegate() const { return *impl->delegate; }
-void                       PermInterceptor::registerListener(ll::event::ListenerPtr listener) {
+void PermInterceptor::registerListenerIf(bool cond, std::function<ll::event::ListenerPtr()> factory) {
+    if (cond) {
+        auto listener = factory();
+        this->registerListener(std::move(listener));
+    }
+}
+void PermInterceptor::registerListener(ll::event::ListenerPtr listener) {
     if (!listener) return;
     impl->listeners.emplace_back(std::move(listener));
 }
