@@ -34,7 +34,7 @@ inline static bool applyDecision(PermDecision decision, T& event) {
 #define asDecision(BOOL_V) (BOOL_V ? PermDecision::Allow : PermDecision::Deny)
 
 template <std::derived_from<ll::event::Event> T>
-inline static bool applyDecision(std::optional<bool> result, T& event) {
+inline static bool applyDecision(bool result, T& event) {
     return applyDecision(asDecision(result), event);
 }
 
