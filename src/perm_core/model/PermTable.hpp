@@ -14,28 +14,29 @@ struct RolePerms final {
         bool member;
         bool guest;
     };
-    Entry allowDestroy{};        // 允许破坏方块
-    Entry allowPlace{};          // 允许放置方块
-    Entry useBucket{};           // 允许使用桶(水/岩浆/...)
-    Entry allowAxePeeled{};      // 允许斧头去皮
-    Entry useHoe{};              // 允许使用锄头
-    Entry useShovel{};           // 允许使用铲子
-    Entry placeBoat{};           // 允许放置船
-    Entry placeMinecart{};       // 允许放置矿车
-    Entry useButton{};           // 允许使用按钮
-    Entry useDoor{};             // 允许使用门
-    Entry useFenceGate{};        // 允许使用栅栏门
-    Entry allowInteractEntity{}; // 允许与实体交互
-    Entry useTrapdoor{};         // 允许使用活板门
-    Entry editSign{};            // 允许编辑告示牌
-    Entry useShulkerBox{};       // 允许使用潜影盒
-    Entry useCraftingTable{};    // 允许使用工作台
-    Entry useLever{};            // 允许使用拉杆 // TODO: 拉杆、按钮合并为 useRedstoneComponent ?
-    Entry useFurnaces{};         // 允许使用所有熔炉类方块（熔炉、高炉、烟熏炉）
-    Entry allowPlayerDamage{};   // 玩家受到伤害
-    Entry allowHostileDamage{};  // 敌对生物受到伤害
-    Entry allowFriendlyDamage{}; // 友好生物受到伤害
-    Entry allowNeutralDamage{};  // 中立/特殊生物受到伤害
+    Entry allowDestroy{};          // 允许破坏方块
+    Entry allowPlace{};            // 允许放置方块
+    Entry useBucket{};             // 允许使用桶(水/岩浆/...)
+    Entry allowAxePeeled{};        // 允许斧头去皮
+    Entry useHoe{};                // 允许使用锄头
+    Entry useShovel{};             // 允许使用铲子
+    Entry placeBoat{};             // 允许放置船
+    Entry placeMinecart{};         // 允许放置矿车
+    Entry useButton{};             // 允许使用按钮
+    Entry useDoor{};               // 允许使用门
+    Entry useFenceGate{};          // 允许使用栅栏门
+    Entry allowInteractEntity{};   // 允许与实体交互
+    Entry useTrapdoor{};           // 允许使用活板门
+    Entry editSign{};              // 允许编辑告示牌
+    Entry useShulkerBox{};         // 允许使用潜影盒
+    Entry useCraftingTable{};      // 允许使用工作台
+    Entry useLever{};              // 允许使用拉杆 // TODO: 拉杆、按钮合并为 useRedstoneComponent ?
+    Entry useFurnaces{};           // 允许使用所有熔炉类方块（熔炉、高炉、烟熏炉）
+    Entry allowPlayerDamage{};     // 玩家受到伤害
+    Entry allowHostileDamage{};    // 敌对生物受到伤害
+    Entry allowFriendlyDamage{};   // 友好生物受到伤害
+    Entry allowNeutralDamage{};    // 中立/特殊生物受到伤害
+    Entry allowPlayerPickupItem{}; // 允许玩家拾取物品
 };
 
 struct PermTable final {

@@ -203,6 +203,7 @@ void PermInterceptor::registerPlayerInterceptor(ListenerConfig const& config) {
             }
 
             auto role = delegate.getRole(player, blockSource, pos);
+            TRACE_STEP_ROLE(role);
             if (applyPrivilege(role, ev)) {
                 return;
             }
@@ -211,6 +212,38 @@ void PermInterceptor::registerPlayerInterceptor(ListenerConfig const& config) {
                 if (auto entry = PermMapping::get().lookup<RolePerms::Entry>(actor.getTypeName().data(), table)) {
                     if (applyRoleInterceptor(role, *entry, ev)) return;
                 }
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, pos), ev);
+        });
+    });
+
+    registerListenerIf(config.PlayerPickUpItemEvent, [&]() {
+        return bus.emplaceListener<ll::event::PlayerPickUpItemEvent>([&](ll::event::PlayerPickUpItemEvent& ev) {
+            TRACE_THIS_EVENT(ll::event::PlayerPickUpItemEvent);
+
+            auto&    player      = ev.self();
+            auto&    item        = ev.itemActor();
+            auto&    blockSource = player.getDimensionBlockSource();
+            BlockPos pos         = item.getPosition();
+
+            TRACE_ADD_MESSAGE("player={}, item={}, pos={}", player.getRealName(), item.getTypeName(), pos.toString());
+
+            auto& delegate = getDelegate();
+            auto  decision = delegate.preCheck(blockSource, pos);
+            TRACE_STEP_PRE_CHECK(decision);
+            if (applyDecision(decision, ev)) {
+                return;
+            }
+
+            auto role = delegate.getRole(player, blockSource, pos);
+            TRACE_STEP_ROLE(role);
+            if (applyPrivilege(role, ev)) {
+                return;
+            }
+
+            if (auto table = delegate.getPermTable(blockSource, pos)) {
+                if (applyRoleInterceptor(role, table->role.allowPlayerPickupItem, ev)) return;
             }
 
             applyDecision(delegate.postPolicy(blockSource, pos), ev);
