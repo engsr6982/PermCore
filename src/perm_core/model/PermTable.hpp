@@ -32,6 +32,10 @@ struct RolePerms final {
     Entry useCraftingTable{};    // 允许使用工作台
     Entry useLever{};            // 允许使用拉杆 // TODO: 拉杆、按钮合并为 useRedstoneComponent ?
     Entry useFurnaces{};         // 允许使用所有熔炉类方块（熔炉、高炉、烟熏炉）
+    Entry allowPlayerDamage{};   // 玩家受到伤害
+    Entry allowHostileDamage{};  // 敌对生物受到伤害
+    Entry allowFriendlyDamage{}; // 友好生物受到伤害
+    Entry allowNeutralDamage{};  // 中立/特殊生物受到伤害
 };
 
 struct PermTable final {

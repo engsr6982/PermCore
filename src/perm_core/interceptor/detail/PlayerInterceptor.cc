@@ -4,10 +4,14 @@
 #include "perm_core/interceptor/PermInterceptor.hpp"
 #include "perm_core/model/PermManager.hpp"
 
+#include "ll/api/event/player/PlayerAttackEvent.h"
 #include "ll/api/event/player/PlayerDestroyBlockEvent.h"
 #include "ll/api/event/player/PlayerInteractBlockEvent.h"
+#include "ll/api/event/player/PlayerPickUpItemEvent.h"
 #include "ll/api/event/player/PlayerPlaceBlockEvent.h"
+#include "ll/api/event/player/PlayerUseItemEvent.h"
 
+#include "mc/deps/core/string/HashedString.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/item/BucketItem.h"
 #include "mc/world/item/FishingRodItem.h"
@@ -24,7 +28,6 @@
 #include "mc/world/level/block/ShulkerBoxBlock.h"
 #include "mc/world/level/block/SignBlock.h"
 #include "mc/world/level/block/SmokerBlock.h"
-
 
 namespace permc {
 
@@ -172,6 +175,44 @@ void PermInterceptor::registerPlayerInterceptor(ListenerConfig const& config) {
                     }
                 }
             }
+            applyDecision(delegate.postPolicy(blockSource, pos), ev);
+        });
+    });
+
+    registerListenerIf(config.PlayerAttackEvent, [&]() {
+        return bus.emplaceListener<ll::event::PlayerAttackEvent>([&](ll::event::PlayerAttackEvent& ev) {
+            TRACE_THIS_EVENT(ll::event::PlayerAttackEvent);
+
+            auto&    player      = ev.self();
+            auto&    actor       = ev.target();
+            BlockPos pos         = actor.getPosition();
+            auto&    blockSource = actor.getDimensionBlockSource();
+
+            TRACE_ADD_MESSAGE(
+                "player={}, target={}, pos={}",
+                player.getRealName(),
+                actor.getTypeName(),
+                pos.toString()
+            );
+
+            auto& delegate = getDelegate();
+            auto  decision = delegate.preCheck(blockSource, pos);
+            TRACE_STEP_PRE_CHECK(decision);
+            if (applyDecision(decision, ev)) {
+                return;
+            }
+
+            auto role = delegate.getRole(player, blockSource, pos);
+            if (applyPrivilege(role, ev)) {
+                return;
+            }
+
+            if (auto table = delegate.getPermTable(blockSource, pos)) {
+                if (auto entry = PermManager::get().lookup<RolePerms::Entry>(actor.getTypeName().data(), table)) {
+                    if (applyRoleInterceptor(role, *entry, ev)) return;
+                }
+            }
+
             applyDecision(delegate.postPolicy(blockSource, pos), ev);
         });
     });

@@ -33,6 +33,7 @@ public:
         bool PlayerDestroyBlockEvent  = true;
         bool PlayerPlacingBlockEvent  = true;
         bool PlayerInteractBlockEvent = true;
+        bool PlayerAttackEvent        = true;
 
         // env
         bool FireSpreadEvent = true;

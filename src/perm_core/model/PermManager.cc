@@ -88,7 +88,7 @@ std::optional<size_t> PermManager::lookup(TypeName const& typeName) const {
 void PermManager::initDefaultMapping() {
     impl_->typeMapping_.clear();
     impl_->typeMapping_ = {
-      // TODO
+        // TODO: PlayerAttackEvent => allowPlayerDamage/allowHostileDamage/allowFriendlyDamage/allowNeutralDamage
     };
 }
 ll::Expected<> PermManager::loadMapping(std::filesystem::path const& path) {
