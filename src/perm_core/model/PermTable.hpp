@@ -6,7 +6,9 @@ namespace permc {
 
 
 struct EnvironmentPerms final {
-    bool allowFireSpread; // 火焰蔓延
+    bool allowFireSpread;   // 火焰蔓延
+    bool allowMonsterSpawn; // 怪物生成
+    bool allowAnimalSpawn;  // 动物生成
 };
 
 struct RolePerms final {

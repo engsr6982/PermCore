@@ -35,6 +35,8 @@ public:
         bool PlayerInteractBlockEvent = true;
         bool PlayerAttackEvent        = true;
         bool PlayerPickUpItemEvent    = true;
+        bool SpawnedMobEvent          = true;
+        bool ActorHurtEvent           = true;
 
         // env
         bool FireSpreadEvent = true;
@@ -53,6 +55,7 @@ private:
 
     // detail
     void registerLLPlayerInterceptor(ListenerConfig const& config);
+    void registerLLEntityInterceptor(ListenerConfig const& config);
     void registerLLWorldInterceptor(ListenerConfig const& config);
 };
 
