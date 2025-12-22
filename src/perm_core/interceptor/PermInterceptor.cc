@@ -13,8 +13,8 @@ PermInterceptor::PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, 
 : impl(std::make_unique<Impl>()) {
     impl->delegate = std::move(delegate);
 
-    registerPlayerInterceptor(config);
-    registerWorldInterceptor(config);
+    registerLLPlayerInterceptor(config);
+    registerLLWorldInterceptor(config);
 }
 PermInterceptor::~PermInterceptor() {
     auto& bus = ll::event::EventBus::getInstance();

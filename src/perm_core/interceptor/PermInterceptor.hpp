@@ -52,8 +52,8 @@ private:
     void registerListener(ll::event::ListenerPtr listener);
 
     // detail
-    void registerPlayerInterceptor(ListenerConfig const& config);
-    void registerWorldInterceptor(ListenerConfig const& config);
+    void registerLLPlayerInterceptor(ListenerConfig const& config);
+    void registerLLWorldInterceptor(ListenerConfig const& config);
 };
 
 } // namespace permc

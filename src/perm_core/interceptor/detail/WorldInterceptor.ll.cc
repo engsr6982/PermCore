@@ -7,7 +7,7 @@
 
 namespace permc {
 
-void PermInterceptor::registerWorldInterceptor(ListenerConfig const& config) {
+void PermInterceptor::registerLLWorldInterceptor(ListenerConfig const& config) {
     registerListenerIf(config.FireSpreadEvent, [&]() {
         return ll::event::EventBus::getInstance().emplaceListener<ll::event::FireSpreadEvent>(
             [&](ll::event::FireSpreadEvent& ev) {

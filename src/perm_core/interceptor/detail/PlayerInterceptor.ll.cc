@@ -31,7 +31,7 @@
 
 namespace permc {
 
-void PermInterceptor::registerPlayerInterceptor(ListenerConfig const& config) {
+void PermInterceptor::registerLLPlayerInterceptor(ListenerConfig const& config) {
     auto& bus = ll::event::EventBus::getInstance();
     registerListenerIf(config.PlayerDestroyBlockEvent, [&]() {
         return bus.emplaceListener<ll::event::PlayerDestroyBlockEvent>([&](ll::event::PlayerDestroyBlockEvent& ev) {
