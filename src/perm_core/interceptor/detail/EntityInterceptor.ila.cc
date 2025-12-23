@@ -174,6 +174,41 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
             applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
         });
     });
+
+    registerListenerIf(config.ActorTriggerPressurePlateBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::ActorTriggerPressurePlateBeforeEvent>(
+            [&](ila::mc::ActorTriggerPressurePlateBeforeEvent& ev) {
+                TRACE_THIS_EVENT(ila::mc::ActorTriggerPressurePlateBeforeEvent);
+
+                auto& actor       = ev.self();
+                auto& blockPos    = ev.pos();
+                auto& blockSource = actor.getDimensionBlockSource();
+
+                auto isPlayer = actor.isPlayer();
+
+                TRACE_ADD_MESSAGE("pos={}, isPlayer={}", blockPos.toString(), isPlayer);
+
+                auto& delegate = getDelegate();
+                auto  decision = delegate.preCheck(blockSource, blockPos);
+                TRACE_STEP_PRE_CHECK(decision);
+                if (applyDecision(decision, ev)) return;
+
+                auto role = PermRole::Gust;
+                if (isPlayer) {
+                    auto& player = static_cast<Player&>(actor);
+                    role         = delegate.getRole(player, blockSource, blockPos);
+                }
+                TRACE_STEP_ROLE(role);
+                if (applyPrivilege(role, ev)) return;
+
+                if (auto table = delegate.getPermTable(blockSource, blockPos)) {
+                    if (applyRoleInterceptor(role, table->role.usePressurePlate, ev)) return;
+                }
+
+                applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
+            }
+        );
+    });
 }
 
 } // namespace permc

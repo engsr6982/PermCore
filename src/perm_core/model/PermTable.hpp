@@ -42,6 +42,7 @@ struct RolePerms final {
     Entry allowPlayerPickupItem{}; // 允许玩家拾取物品
     Entry allowRideTrans{};        // 允许骑乘运输工具（矿车、船）
     Entry allowRideEntity{};       // 允许骑乘实体
+    Entry usePressurePlate{};      // 触发压力板
 };
 
 struct PermTable final {

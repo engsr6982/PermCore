@@ -30,19 +30,20 @@ class PermInterceptor final {
 
 public:
     struct ListenerConfig {
-        bool PlayerDestroyBlockEvent  = true; // LL
-        bool PlayerPlacingBlockEvent  = true; // LL
-        bool PlayerInteractBlockEvent = true; // LL
-        bool PlayerAttackEvent        = true; // LL
-        bool PlayerPickUpItemEvent    = true; // LL
-        bool SpawnedMobEvent          = true; // LL (env)
-        bool ActorHurtEvent           = true; // LL
-        bool FireSpreadEvent          = true; // LL (env)
-        bool ActorDestroyBlockEvent   = true; // ILA (env)
-        bool MobTakeBlockBeforeEvent  = true; // ILA (env)
-        bool MobPlaceBlockBeforeEvent = true; // ILA (env)
-        bool ActorRideBeforeEvent     = true; // ILA
-        bool MobHurtEffectBeforeEvent = true; // ILA
+        bool PlayerDestroyBlockEvent              = true; // LL
+        bool PlayerPlacingBlockEvent              = true; // LL
+        bool PlayerInteractBlockEvent             = true; // LL
+        bool PlayerAttackEvent                    = true; // LL
+        bool PlayerPickUpItemEvent                = true; // LL
+        bool SpawnedMobEvent                      = true; // LL (env)
+        bool ActorHurtEvent                       = true; // LL
+        bool FireSpreadEvent                      = true; // LL (env)
+        bool ActorDestroyBlockEvent               = true; // ILA (env)
+        bool MobTakeBlockBeforeEvent              = true; // ILA (env)
+        bool MobPlaceBlockBeforeEvent             = true; // ILA (env)
+        bool ActorRideBeforeEvent                 = true; // ILA
+        bool MobHurtEffectBeforeEvent             = true; // ILA
+        bool ActorTriggerPressurePlateBeforeEvent = true; // ILA
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
