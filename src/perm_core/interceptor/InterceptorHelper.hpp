@@ -21,9 +21,9 @@ inline static bool applyDecision(PermDecision decision, T& event) {
     case PermDecision::Abstain:
         return false;
     case PermDecision::Deny:
-        if constexpr (requires { event.cancel(); }) {
-            event.cancel();
-        }
+        static_assert(requires { event.cancel(); }, "Event type must have cancel() method");
+        event.cancel();
+        [[fallthrough]];
     case PermDecision::Allow:
         return true;
     }
