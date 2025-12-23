@@ -16,6 +16,7 @@
 #include "mc/world/actor/ActorDefinitionIdentifier.h"
 #include "perm_core/interceptor/InterceptorHelper.hpp"
 #include "perm_core/interceptor/InterceptorTrace.hpp"
+#include "perm_core/model/PermMapping.hpp"
 
 #include <ll/api/event/EventBus.h>
 
@@ -133,6 +134,40 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
                     if (applyRoleInterceptor(role, table->role.allowRideTrans, ev)) return;
                 } else {
                     if (applyRoleInterceptor(role, table->role.allowRideEntity, ev)) return;
+                }
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
+        });
+    });
+
+    registerListenerIf(config.MobHurtEffectBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::MobHurtEffectBeforeEvent>([&](ila::mc::MobHurtEffectBeforeEvent& ev) {
+            TRACE_THIS_EVENT(ila::mc::MobHurtEffectBeforeEvent);
+
+            auto& actor       = ev.self();
+            auto  sourceActor = ev.source();
+
+            if (!sourceActor || !sourceActor->isPlayer()) {
+                TRACE_ADD_MESSAGE("source is not player");
+                return;
+            }
+            auto&    blockSource = actor.getDimensionBlockSource();
+            auto&    player      = static_cast<Player&>(sourceActor.value());
+            BlockPos blockPos    = actor.getPosition();
+
+            auto& delegate = getDelegate();
+            auto  decision = delegate.preCheck(blockSource, blockPos);
+            TRACE_STEP_PRE_CHECK(decision);
+            if (applyDecision(decision, ev)) return;
+
+            auto role = delegate.getRole(player, blockSource, blockPos);
+            TRACE_STEP_ROLE(role);
+            if (applyPrivilege(role, ev)) return;
+
+            if (auto table = delegate.getPermTable(blockSource, blockPos)) {
+                if (auto entry = PermMapping::get().lookup<RolePerms::Entry>(actor.getTypeName().data(), table)) {
+                    if (applyRoleInterceptor(role, *entry, ev)) return;
                 }
             }
 
