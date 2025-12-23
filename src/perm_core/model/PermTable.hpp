@@ -49,6 +49,8 @@ struct PermTable final {
 static_assert(std::is_aggregate_v<PermTable>, "Reflection depends on aggregate types");
 static_assert(ll::reflection::member_count_v<PermTable> == 2);
 static_assert(ll::reflection::member_count_v<RolePerms::Entry> == 2);
+static_assert(std::is_standard_layout_v<PermTable>);
+static_assert(std::is_trivially_copyable_v<RolePerms::Entry>);
 
 // 成员校验
 template <typename T>

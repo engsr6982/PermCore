@@ -15,29 +15,37 @@ namespace permc {
 
 
 struct PermMapping::Impl {
-    std::unordered_map<PermFieldName, size_t> const fieldOffset_;  // 1. 权限字段 => 权限表中的偏移量
-    std::unordered_map<TypeName, PermFieldName>     typeMapping_;  // 2. TypeName => 权限字段
-    std::unordered_map<TypeName, size_t>            finalMapping_; // 3. TypeName => 权限表中的偏移量
+    using FieldDescriptorPtr = std::shared_ptr<FieldDescriptor>;
+    std::unordered_map<PermFieldName, FieldDescriptorPtr> const fieldOffset_;  // 1. 权限字段 => 权限表中的偏移量
+    std::unordered_map<TypeName, PermFieldName>                 typeMapping_;  // 2. TypeName => 权限字段
+    std::unordered_map<TypeName, FieldDescriptorPtr>            finalMapping_; // 3. TypeName => 权限表中的偏移量
 
     explicit Impl() {
         {
             PermTable  table{};
-            auto&      unConstMap = const_cast<std::unordered_map<PermFieldName, size_t>&>(fieldOffset_);
+            auto&      unConstMap = const_cast<std::unordered_map<PermFieldName, FieldDescriptorPtr>&>(fieldOffset_);
             auto const baseAddr   = reinterpret_cast<char const*>(&table); // 基地址
 
             using EntryType = RolePerms::Entry; // 目标类型：视为“叶子”，直接记录 Offset，不继续递归
             auto visitor    = [&](auto&& self, auto& currentObj) -> void {
                 ll::reflection::forEachMember(currentObj, [&](std::string_view name, auto& field) {
-                    using FieldType = std::remove_cvref_t<decltype(field)>;
+                    using field_type = std::remove_cvref_t<decltype(field)>;
 
                     // 情况 1: 是角色权限节点 (Entry) 或者是环境权限节点 (bool)
-                    if constexpr (std::is_same_v<FieldType, EntryType> || std::is_same_v<FieldType, bool>) {
+                    if constexpr (std::is_same_v<field_type, EntryType> || std::is_same_v<field_type, bool>) {
                         auto const   fieldAddr = reinterpret_cast<char const*>(&field);
                         size_t const offset    = fieldAddr - baseAddr;
-                        unConstMap.emplace(name, offset);
+                        unConstMap.emplace(
+                            name,
+                            std::make_shared<FieldDescriptor>(
+                                offset,
+                                sizeof(field_type),
+                                std::same_as<field_type, bool> ? FieldType::Bool : FieldType::Entry
+                            )
+                        );
                     }
                     // 情况 2: 是其他结构体 (RolePerms, EnvironmentPerms)
-                    else if constexpr (ll::reflection::is_reflectable_v<FieldType>) {
+                    else if constexpr (ll::reflection::is_reflectable_v<field_type>) {
                         self(self, field);
                     }
                 });
@@ -48,8 +56,9 @@ struct PermMapping::Impl {
 #ifdef PERMC_DEBUG
         std::ostringstream oss;
         oss << "fieldOffset_:\n";
-        for (auto const& [name, offset] : fieldOffset_) {
-            oss << "  " << name.getString() << ": " << offset << "\n";
+        for (auto const& [name, descriptor] : fieldOffset_) {
+            oss << "  " << name.getString() << " => sizeof:" << descriptor->size << ", offset:" << descriptor->offset
+                << ", type:" << magic_enum::enum_name(descriptor->type) << "\n";
         }
         std::cout << oss.str() << std::endl;
 #endif
@@ -72,9 +81,9 @@ ll::Expected<> PermMapping::initTypeNameMapping(std::filesystem::path const& pat
     }
     return compileFinalMapping();
 }
-std::optional<size_t> PermMapping::lookup(TypeName const& typeName) const {
+optional_ref<PermMapping::FieldDescriptor> PermMapping::lookup(TypeName const& typeName) const {
     if (auto it = impl_->finalMapping_.find(typeName); it != impl_->finalMapping_.end()) {
-        return it->second;
+        return it->second.get();
     }
     return std::nullopt;
 }
