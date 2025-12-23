@@ -39,6 +39,7 @@ public:
         bool ActorHurtEvent           = true; // LL
         bool FireSpreadEvent          = true; // LL (env)
         bool ActorDestroyBlockEvent   = true; // ILA (env)
+        bool MobTakeBlockBeforeEvent  = true; // ILA (env)
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);

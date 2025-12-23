@@ -9,7 +9,7 @@ struct EnvironmentPerms final {
     bool allowFireSpread;   // 火焰蔓延
     bool allowMonsterSpawn; // 怪物生成
     bool allowAnimalSpawn;  // 动物生成
-    bool allowActorDestroy; // 实体破坏
+    bool allowActorDestroy; // 实体破坏(破坏方块、拾取方块)
 };
 
 struct RolePerms final {
