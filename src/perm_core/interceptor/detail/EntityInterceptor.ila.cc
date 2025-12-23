@@ -69,6 +69,29 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
             applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
         });
     });
+
+    registerListenerIf(config.MobPlaceBlockBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::MobPlaceBlockBeforeEvent>([&](ila::mc::MobPlaceBlockBeforeEvent& ev) {
+            TRACE_THIS_EVENT(ila::mc::MobPlaceBlockBeforeEvent);
+
+            auto& actor       = ev.self();
+            auto& blockPos    = ev.pos();
+            auto& blockSource = actor.getDimensionBlockSource();
+
+            TRACE_ADD_MESSAGE("actor={}, pos={}", actor.getTypeName(), blockPos.toString());
+
+            auto& delegate = getDelegate();
+            auto  decision = delegate.preCheck(blockSource, blockPos);
+            TRACE_STEP_PRE_CHECK(decision);
+            if (applyDecision(decision, ev)) return;
+
+            if (auto table = delegate.getPermTable(blockSource, blockPos)) {
+                if (applyDecision(table->environment.allowActorDestroy, ev)) return;
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
+        });
+    });
 }
 
 } // namespace permc
