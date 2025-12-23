@@ -30,16 +30,15 @@ class PermInterceptor final {
 
 public:
     struct ListenerConfig {
-        bool PlayerDestroyBlockEvent  = true;
-        bool PlayerPlacingBlockEvent  = true;
-        bool PlayerInteractBlockEvent = true;
-        bool PlayerAttackEvent        = true;
-        bool PlayerPickUpItemEvent    = true;
-        bool SpawnedMobEvent          = true;
-        bool ActorHurtEvent           = true;
-
-        // env
-        bool FireSpreadEvent = true;
+        bool PlayerDestroyBlockEvent  = true; // LL
+        bool PlayerPlacingBlockEvent  = true; // LL
+        bool PlayerInteractBlockEvent = true; // LL
+        bool PlayerAttackEvent        = true; // LL
+        bool PlayerPickUpItemEvent    = true; // LL
+        bool SpawnedMobEvent          = true; // LL (env)
+        bool ActorHurtEvent           = true; // LL
+        bool FireSpreadEvent          = true; // LL (env)
+        bool ActorDestroyBlockEvent   = true; // ILA (env)
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
@@ -57,6 +56,8 @@ private:
     void registerLLPlayerInterceptor(ListenerConfig const& config);
     void registerLLEntityInterceptor(ListenerConfig const& config);
     void registerLLWorldInterceptor(ListenerConfig const& config);
+
+    void registerIlaEntityInterceptor(ListenerConfig const& config);
 };
 
 } // namespace permc
