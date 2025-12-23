@@ -92,6 +92,53 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
             applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
         });
     });
+
+    registerListenerIf(config.ActorRideBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::ActorRideBeforeEvent>([&](ila::mc::ActorRideBeforeEvent& ev) {
+            TRACE_THIS_EVENT(ila::mc::ActorRideBeforeEvent);
+
+            Actor& passenger   = ev.self();
+            Actor& target      = ev.target();
+            auto&  blockSource = target.getDimensionBlockSource();
+
+            if (!passenger.isPlayer()) {
+                TRACE_ADD_MESSAGE("passenger is not player");
+                return;
+            }
+            if (target.hasCategory(ActorCategory::Ridable)) {
+                TRACE_ADD_MESSAGE("target is rideable");
+                return;
+            }
+
+            TRACE_ADD_MESSAGE(
+                "passenger: {}, target: {}",
+                passenger.getActorIdentifier().mIdentifier.get(),
+                target.getTypeName()
+            );
+            auto&    player   = static_cast<Player&>(passenger);
+            BlockPos blockPos = target.getPosition();
+
+            auto& delegate = getDelegate();
+            auto  decision = delegate.preCheck(blockSource, blockPos);
+            TRACE_STEP_PRE_CHECK(decision);
+            if (applyDecision(decision, ev)) return;
+
+            auto role = delegate.getRole(player, blockSource, blockPos);
+            TRACE_STEP_ROLE(role);
+            if (applyPrivilege(role, ev)) return;
+
+            if (auto table = delegate.getPermTable(blockSource, blockPos)) {
+                if (target.hasCategory(ActorCategory::BoatRideable)
+                    || target.hasCategory(ActorCategory::MinecartRidable)) {
+                    if (applyRoleInterceptor(role, table->role.allowRideTrans, ev)) return;
+                } else {
+                    if (applyRoleInterceptor(role, table->role.allowRideEntity, ev)) return;
+                }
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
+        });
+    });
 }
 
 } // namespace permc

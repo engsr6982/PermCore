@@ -40,6 +40,8 @@ struct RolePerms final {
     Entry allowFriendlyDamage{};   // 友好生物受到伤害
     Entry allowNeutralDamage{};    // 中立/特殊生物受到伤害
     Entry allowPlayerPickupItem{}; // 允许玩家拾取物品
+    Entry allowRideTrans{};        // 允许骑乘运输工具（矿车、船）
+    Entry allowRideEntity{};       // 允许骑乘实体
 };
 
 struct PermTable final {

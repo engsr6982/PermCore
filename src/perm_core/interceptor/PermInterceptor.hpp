@@ -41,6 +41,7 @@ public:
         bool ActorDestroyBlockEvent   = true; // ILA (env)
         bool MobTakeBlockBeforeEvent  = true; // ILA (env)
         bool MobPlaceBlockBeforeEvent = true; // ILA (env)
+        bool ActorRideBeforeEvent     = true; // ILA
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
