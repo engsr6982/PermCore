@@ -44,6 +44,7 @@ public:
         bool ActorRideBeforeEvent                 = true; // ILA
         bool MobHurtEffectBeforeEvent             = true; // ILA
         bool ActorTriggerPressurePlateBeforeEvent = true; // ILA
+        bool ProjectileCreateBeforeEvent          = true; // ILA
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
