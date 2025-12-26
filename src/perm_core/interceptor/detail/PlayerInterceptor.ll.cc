@@ -156,6 +156,7 @@ void PermInterceptor::registerLLPlayerInterceptor(ListenerConfig const& config) 
                     } else if (legacyBlock.mIsTrapdoor) {
                         if (applyRoleInterceptor(role, table->role.useTrapdoor, ev)) return;
                     } else if (vftable == SignBlock::$vftable() || vftable == HangingSignBlock::$vftable()) {
+                        // TODO: 验证移除此分支仅使用独立事件对权限是否有影响
                         if (applyRoleInterceptor(role, table->role.editSign, ev)) return;
                     } else if (vftable == ShulkerBoxBlock::$vftable()) {
                         if (applyRoleInterceptor(role, table->role.useShulkerBox, ev)) return;
