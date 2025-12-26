@@ -46,6 +46,7 @@ public:
         bool ActorTriggerPressurePlateBeforeEvent = true; // ILA
         bool ProjectileCreateBeforeEvent          = true; // ILA
         bool PlayerInteractEntityBeforeEvent      = true; // ILA
+        bool ArmorStandSwapItemBeforeEvent        = true; // ILA
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);

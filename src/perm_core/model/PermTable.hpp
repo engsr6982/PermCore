@@ -45,6 +45,7 @@ struct RolePerms final {
     Entry usePressurePlate{};       // 触发压力板
     Entry allowFishingRodAndHook{}; // 允许使用钓鱼竿和鱼钩
     Entry allowProjectileCreate{};  // 允许弹射物创建
+    Entry useArmorStand{};          // 允许使用盔甲架
 };
 
 struct PermTable final {

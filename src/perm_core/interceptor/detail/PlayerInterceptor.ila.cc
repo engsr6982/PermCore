@@ -52,6 +52,42 @@ void PermInterceptor::registerIlaPlayerInterceptor(ListenerConfig const& config)
             }
         );
     });
+
+    // TODO: 验证移除 PlayerAttackBlockBeforeEvent 事件对 allowAttackDragonEgg 权限的影响
+
+    registerListenerIf(config.ArmorStandSwapItemBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::ArmorStandSwapItemBeforeEvent>(
+            [&](ila::mc::ArmorStandSwapItemBeforeEvent& ev) {
+                TRACE_THIS_EVENT(ila::mc::ArmorStandSwapItemBeforeEvent);
+
+                auto&    player      = ev.player();
+                auto&    armorStand  = ev.self();
+                auto&    blockSource = armorStand.getDimensionBlockSource();
+                BlockPos pos         = armorStand.getPosition();
+
+                TRACE_ADD_MESSAGE("player={}, armorStandPos={}", player.getRealName(), pos.toString());
+
+                auto& delegate = getDelegate();
+                auto  decision = delegate.preCheck(blockSource, pos);
+                TRACE_STEP_PRE_CHECK(decision);
+                if (applyDecision(decision, ev)) {
+                    return;
+                }
+
+                auto role = delegate.getRole(player, blockSource, pos);
+                TRACE_STEP_ROLE(role);
+                if (applyPrivilege(role, ev)) {
+                    return;
+                }
+
+                if (auto table = delegate.getPermTable(blockSource, pos)) {
+                    if (applyRoleInterceptor(role, table->role.useArmorStand, ev)) return;
+                }
+
+                applyDecision(delegate.postPolicy(blockSource, pos), ev);
+            }
+        );
+    });
 }
 
 } // namespace permc
