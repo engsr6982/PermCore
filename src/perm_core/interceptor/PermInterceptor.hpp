@@ -45,6 +45,7 @@ public:
         bool MobHurtEffectBeforeEvent             = true; // ILA
         bool ActorTriggerPressurePlateBeforeEvent = true; // ILA
         bool ProjectileCreateBeforeEvent          = true; // ILA
+        bool PlayerInteractEntityBeforeEvent      = true; // ILA
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
@@ -64,6 +65,7 @@ private:
     void registerLLWorldInterceptor(ListenerConfig const& config);
 
     void registerIlaEntityInterceptor(ListenerConfig const& config);
+    void registerIlaPlayerInterceptor(ListenerConfig const& config);
 };
 
 } // namespace permc
