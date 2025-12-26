@@ -47,6 +47,7 @@ struct RolePerms final {
     Entry allowProjectileCreate{};  // 允许弹射物创建
     Entry useArmorStand{};          // 允许使用盔甲架
     Entry allowDropItem{};          // 允许丢弃物品
+    Entry useItemFrame{};           // 允许操作物品展示框
 };
 
 struct PermTable final {

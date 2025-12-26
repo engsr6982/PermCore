@@ -119,6 +119,39 @@ void PermInterceptor::registerIlaPlayerInterceptor(ListenerConfig const& config)
             applyDecision(delegate.postPolicy(blockSource, pos), ev);
         });
     });
+
+    registerListenerIf(config.PlayerOperatedItemFrameBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::PlayerOperatedItemFrameBeforeEvent>(
+            [&](ila::mc::PlayerOperatedItemFrameBeforeEvent& ev) {
+                TRACE_THIS_EVENT(ila::mc::PlayerOperatedItemFrameBeforeEvent);
+
+                auto& player      = ev.self();
+                auto& pos         = ev.blockPos();
+                auto& blockSource = player.getDimensionBlockSource();
+
+                TRACE_ADD_MESSAGE("player={}, pos={}", player.getRealName(), pos.toString());
+
+                auto& delegate = getDelegate();
+                auto  decision = delegate.preCheck(blockSource, pos);
+                TRACE_STEP_PRE_CHECK(decision);
+                if (applyDecision(decision, ev)) {
+                    return;
+                }
+
+                auto role = delegate.getRole(player, blockSource, pos);
+                TRACE_STEP_ROLE(role);
+                if (applyPrivilege(role, ev)) {
+                    return;
+                }
+
+                if (auto table = delegate.getPermTable(blockSource, pos)) {
+                    if (applyRoleInterceptor(role, table->role.useItemFrame, ev)) return;
+                }
+
+                applyDecision(delegate.postPolicy(blockSource, pos), ev);
+            }
+        );
+    });
 }
 
 } // namespace permc
