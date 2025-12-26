@@ -49,6 +49,7 @@ public:
         bool ArmorStandSwapItemBeforeEvent        = true; // ILA
         bool PlayerDropItemBeforeEvent            = true; // ILA
         bool PlayerOperatedItemFrameBeforeEvent   = true; // ILA
+        bool PlayerEditSignBeforeEvent            = true; // ILA
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
