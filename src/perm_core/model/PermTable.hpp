@@ -46,6 +46,7 @@ struct RolePerms final {
     Entry allowFishingRodAndHook{}; // 允许使用钓鱼竿和鱼钩
     Entry allowProjectileCreate{};  // 允许弹射物创建
     Entry useArmorStand{};          // 允许使用盔甲架
+    Entry allowDropItem{};          // 允许丢弃物品
 };
 
 struct PermTable final {

@@ -88,6 +88,37 @@ void PermInterceptor::registerIlaPlayerInterceptor(ListenerConfig const& config)
             }
         );
     });
+
+    registerListenerIf(config.PlayerDropItemBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::PlayerDropItemBeforeEvent>([&](ila::mc::PlayerDropItemBeforeEvent& ev) {
+            TRACE_THIS_EVENT(ila::mc::PlayerDropItemBeforeEvent);
+
+            auto&    player      = ev.self();
+            auto&    blockSource = player.getDimensionBlockSource();
+            BlockPos pos         = player.getPosition();
+
+            TRACE_ADD_MESSAGE("player={}", player.getRealName());
+
+            auto& delegate = getDelegate();
+            auto  decision = delegate.preCheck(blockSource, pos);
+            TRACE_STEP_PRE_CHECK(decision);
+            if (applyDecision(decision, ev)) {
+                return;
+            }
+
+            auto role = delegate.getRole(player, blockSource, pos);
+            TRACE_STEP_ROLE(role);
+            if (applyPrivilege(role, ev)) {
+                return;
+            }
+
+            if (auto table = delegate.getPermTable(blockSource, pos)) {
+                if (applyRoleInterceptor(role, table->role.allowDropItem, ev)) return;
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, pos), ev);
+        });
+    });
 }
 
 } // namespace permc
