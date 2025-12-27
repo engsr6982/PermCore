@@ -46,7 +46,10 @@ struct InterceptorDelegate {
         BlockPos const& pistonPos,
         BlockPos const& pushPos,
         bool EnvironmentPerms::* field
-    );
+    ) = 0;
+
+    virtual PermDecision
+    handleBlockFall(BlockSource& blockSource, BlockPos const& fallPos, bool EnvironmentPerms::* field) = 0;
 
     template <typename Ty, typename C>
     static Ty access(C& obj, Ty C::* field) {

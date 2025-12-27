@@ -163,6 +163,21 @@ void PermInterceptor::registerIlaWorldInterceptor(ListenerConfig const& config) 
             applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
         });
     });
+
+    registerListenerIf(config.BlockFallBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::BlockFallBeforeEvent>([&](ila::mc::BlockFallBeforeEvent& ev) {
+            auto& blockSource = ev.blockSource();
+            auto& blockPos    = ev.pos();
+
+            auto& delegate = getDelegate();
+            if (applyDecision(delegate.preCheck(blockSource, blockPos), ev)) return;
+
+            auto decision = delegate.handleBlockFall(blockSource, blockPos, &permc::EnvironmentPerms::allowBlockFall);
+            if (applyDecision(decision, ev)) return;
+
+            applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
+        });
+    });
 }
 
 } // namespace permc

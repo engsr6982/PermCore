@@ -14,6 +14,7 @@ struct EnvironmentPerms final {
     bool allowFarmDecay;            // 耕地退化
     bool allowPistonPushOnBoundary; // 活塞推动边界方块
     bool allowRedstoneUpdate;       // 红石更新
+    bool allowBlockFall;            // 方块掉落
 };
 
 struct RolePerms final {
