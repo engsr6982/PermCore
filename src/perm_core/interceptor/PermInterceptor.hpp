@@ -50,6 +50,7 @@ public:
         bool PlayerDropItemBeforeEvent            = true; // ILA
         bool PlayerOperatedItemFrameBeforeEvent   = true; // ILA
         bool PlayerEditSignBeforeEvent            = true; // ILA
+        bool ExplosionBeforeEvent                 = true; // ILA (env)
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
@@ -70,6 +71,7 @@ private:
 
     void registerIlaEntityInterceptor(ListenerConfig const& config);
     void registerIlaPlayerInterceptor(ListenerConfig const& config);
+    void registerIlaWorldInterceptor(ListenerConfig const& config);
 };
 
 } // namespace permc

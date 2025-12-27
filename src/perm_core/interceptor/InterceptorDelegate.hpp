@@ -4,7 +4,9 @@
 
 #include <mc/deps/core/utility/optional_ref.h>
 
+#include "ll/api/coro/Generator.h"
 
+class AABB;
 class BlockPos;
 class Player;
 class BlockSource;
@@ -26,6 +28,8 @@ struct InterceptorDelegate {
     virtual PermRole getRole(Player& player, BlockSource& blockSource, BlockPos const& blockPos) = 0;
 
     virtual optional_ref<PermTable> getPermTable(BlockSource& blockSource, BlockPos const& blockPos) = 0;
+
+    virtual ll::coro::Generator<PermTable const&> queryMatrix(BlockSource& blockSource, AABB const& aabb) = 0;
 
     virtual PermDecision postPolicy(BlockSource& blockSource, BlockPos const& vec3) = 0;
 };
