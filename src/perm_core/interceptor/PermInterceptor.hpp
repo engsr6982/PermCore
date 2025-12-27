@@ -52,6 +52,7 @@ public:
         bool PlayerEditSignBeforeEvent            = true; // ILA
         bool ExplosionBeforeEvent                 = true; // ILA (env)
         bool FarmDecayBeforeEvent                 = true; // ILA (env)
+        bool PistonPushBeforeEvent                = true; // ILA (env)
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);

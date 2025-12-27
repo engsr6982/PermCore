@@ -6,12 +6,13 @@ namespace permc {
 
 
 struct EnvironmentPerms final {
-    bool allowFireSpread;   // 火焰蔓延
-    bool allowMonsterSpawn; // 怪物生成
-    bool allowAnimalSpawn;  // 动物生成
-    bool allowActorDestroy; // 实体破坏(破坏方块、拾取方块、放置方块)
-    bool allowExplode;      // 爆炸
-    bool allowFarmDecay;    // 耕地退化
+    bool allowFireSpread;           // 火焰蔓延
+    bool allowMonsterSpawn;         // 怪物生成
+    bool allowAnimalSpawn;          // 动物生成
+    bool allowActorDestroy;         // 实体破坏(破坏方块、拾取方块、放置方块)
+    bool allowExplode;              // 爆炸
+    bool allowFarmDecay;            // 耕地退化
+    bool allowPistonPushOnBoundary; // 活塞推动边界方块
 };
 
 struct RolePerms final {

@@ -32,6 +32,26 @@ struct InterceptorDelegate {
     virtual ll::coro::Generator<PermTable const&> queryMatrix(BlockSource& blockSource, AABB const& aabb) = 0;
 
     virtual PermDecision postPolicy(BlockSource& blockSource, BlockPos const& vec3) = 0;
+
+    /**
+     * @brief 活塞推拉检查
+     * @param blockSource 方块源
+     * @param pistonPos 活塞位置
+     * @param pushPos 被推方块位置
+     * @param field 应该检查的权限字段指针
+     * @return 拒绝/放行/弃权
+     */
+    virtual PermDecision handlePistonAction(
+        BlockSource&    blockSource,
+        BlockPos const& pistonPos,
+        BlockPos const& pushPos,
+        bool EnvironmentPerms::* field
+    );
+
+    template <typename Ty, typename C>
+    static Ty access(C& obj, Ty C::* field) {
+        return obj.*field;
+    }
 };
 
 

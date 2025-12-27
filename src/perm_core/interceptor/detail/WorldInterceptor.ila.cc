@@ -122,6 +122,31 @@ void PermInterceptor::registerIlaWorldInterceptor(ListenerConfig const& config) 
             applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
         });
     });
+
+    registerListenerIf(config.PistonPushBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::PistonPushBeforeEvent>([&](ila::mc::PistonPushBeforeEvent& ev) {
+            auto& pistonPos   = ev.pistonPos();
+            auto& pushPos     = ev.pushPos();
+            auto& blockSource = ev.blockSource();
+
+            auto& delegate = getDelegate();
+            if (applyDecision(delegate.preCheck(blockSource, pistonPos), ev)) return;
+            if (applyDecision(delegate.preCheck(blockSource, pushPos), ev)) return;
+
+            // 由于活塞事件复杂，需要处理4种可能的情况
+            // 导致无法量化统一处理，故交给上层决定
+            // 内 => 内 / 外 => 内 / 内 => 外 / 外 => 外
+            auto decision =
+                delegate
+                    .handlePistonAction(blockSource, pistonPos, pushPos, &EnvironmentPerms::allowPistonPushOnBoundary);
+            if (applyDecision(decision, ev)) {
+                return;
+            }
+
+            if (applyDecision(delegate.postPolicy(blockSource, pistonPos), ev)) return;
+            if (applyDecision(delegate.postPolicy(blockSource, pushPos), ev)) return;
+        });
+    });
 }
 
 } // namespace permc
