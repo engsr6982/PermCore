@@ -147,6 +147,22 @@ void PermInterceptor::registerIlaWorldInterceptor(ListenerConfig const& config) 
             if (applyDecision(delegate.postPolicy(blockSource, pushPos), ev)) return;
         });
     });
+
+    registerListenerIf(config.RedstoneUpdateBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::RedstoneUpdateBeforeEvent>([&](ila::mc::RedstoneUpdateBeforeEvent& ev) {
+            auto& blockSource = ev.blockSource();
+            auto& blockPos    = ev.pos();
+
+            auto& delegate = getDelegate();
+            if (applyDecision(delegate.preCheck(blockSource, blockPos), ev)) return;
+
+            if (auto table = delegate.getPermTable(blockSource, blockPos)) {
+                if (applyDecision(table->environment.allowRedstoneUpdate, ev)) return;
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
+        });
+    });
 }
 
 } // namespace permc

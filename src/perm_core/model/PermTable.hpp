@@ -13,6 +13,7 @@ struct EnvironmentPerms final {
     bool allowExplode;              // 爆炸
     bool allowFarmDecay;            // 耕地退化
     bool allowPistonPushOnBoundary; // 活塞推动边界方块
+    bool allowRedstoneUpdate;       // 红石更新
 };
 
 struct RolePerms final {
