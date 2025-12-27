@@ -98,6 +98,30 @@ void PermInterceptor::registerIlaWorldInterceptor(ListenerConfig const& config) 
             applyDecision(delegate.postPolicy(blockSource, centerPos), ev);
         });
     });
+
+    registerListenerIf(config.FarmDecayBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::FarmDecayBeforeEvent>([&](ila::mc::FarmDecayBeforeEvent& ev) {
+            TRACE_THIS_EVENT(ila::mc::FarmDecayBeforeEvent)
+
+            auto& blockPos    = ev.pos();
+            auto& blockSource = ev.blockSource();
+
+            TRACE_ADD_MESSAGE("pos={}", blockPos.toString());
+
+            auto& delegate = getDelegate();
+            auto  decision = delegate.preCheck(blockSource, blockPos);
+            TRACE_STEP_PRE_CHECK(decision);
+            if (applyDecision(decision, ev)) {
+                return;
+            }
+
+            if (auto centerTable = delegate.getPermTable(blockSource, blockPos)) {
+                if (applyDecision(centerTable->environment.allowFarmDecay, ev)) return;
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
+        });
+    });
 }
 
 } // namespace permc

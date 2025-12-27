@@ -11,6 +11,7 @@ struct EnvironmentPerms final {
     bool allowAnimalSpawn;  // 动物生成
     bool allowActorDestroy; // 实体破坏(破坏方块、拾取方块、放置方块)
     bool allowExplode;      // 爆炸
+    bool allowFarmDecay;    // 耕地退化
 };
 
 struct RolePerms final {
