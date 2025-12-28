@@ -9,24 +9,19 @@
 #include "ll/api/event/player/PlayerInteractBlockEvent.h"
 #include "ll/api/event/player/PlayerPickUpItemEvent.h"
 #include "ll/api/event/player/PlayerPlaceBlockEvent.h"
-#include "ll/api/event/player/PlayerUseItemEvent.h"
 
 #include "mc/deps/core/string/HashedString.h"
 #include "mc/world/actor/player/Player.h"
 #include "mc/world/item/BucketItem.h"
-#include "mc/world/item/FishingRodItem.h"
-#include "mc/world/item/HatchetItem.h"
-#include "mc/world/item/HoeItem.h"
-#include "mc/world/item/HorseArmorItem.h"
+#include "mc/world/item/FlintAndSteelItem.h"
 #include "mc/world/item/Item.h"
-#include "mc/world/item/ItemTag.h"
-#include "mc/world/item/ShovelItem.h"
 #include "mc/world/item/VanillaItemTags.h"
+#include "mc/world/level/block/BeaconBlock.h"
+#include "mc/world/level/block/BedBlock.h"
 #include "mc/world/level/block/BlastFurnaceBlock.h"
 #include "mc/world/level/block/FurnaceBlock.h"
 #include "mc/world/level/block/HangingSignBlock.h"
 #include "mc/world/level/block/ShulkerBoxBlock.h"
-#include "mc/world/level/block/SignBlock.h"
 #include "mc/world/level/block/SmokerBlock.h"
 
 namespace permc {
@@ -133,15 +128,16 @@ void PermInterceptor::registerLLPlayerInterceptor(ListenerConfig const& config) 
                         if (applyRoleInterceptor(role, table->role.placeBoat, ev)) return;
                     } else if (item->hasTag(VanillaItemTags::Minecart())) {
                         if (applyRoleInterceptor(role, table->role.placeMinecart, ev)) return;
+                    } else if (vftable == FlintAndSteelItem::$vftable()) {
+                        if (applyRoleInterceptor(role, table->role.useFlintAndSteel, ev)) return;
+                    }
+                    // fallback
+                    if (auto entry = PermMapping::get().lookup<RolePerms::Entry>(ev.item().getTypeName(), table)) {
+                        if (applyRoleInterceptor(role, *entry, ev)) {
+                            return;
+                        }
                     }
                 }
-                // fallback
-                if (auto entry = PermMapping::get().lookup<RolePerms::Entry>(ev.item().getTypeName(), table)) {
-                    if (applyRoleInterceptor(role, *entry, ev)) {
-                        return;
-                    }
-                }
-
                 if (auto block = ev.block()) {
                     auto&  legacyBlock = block->getBlockType();
                     void** vftable     = *reinterpret_cast<void** const*>(&legacyBlock);
@@ -156,14 +152,18 @@ void PermInterceptor::registerLLPlayerInterceptor(ListenerConfig const& config) 
                     } else if (legacyBlock.mIsTrapdoor) {
                         if (applyRoleInterceptor(role, table->role.useTrapdoor, ev)) return;
                     } else if (vftable == ShulkerBoxBlock::$vftable()) {
-                        if (applyRoleInterceptor(role, table->role.useShulkerBox, ev)) return;
+                        if (applyRoleInterceptor(role, table->role.useContainer, ev)) return;
                     } else if (legacyBlock.isCraftingBlock()) {
-                        if (applyRoleInterceptor(role, table->role.useCraftingTable, ev)) return;
+                        if (applyRoleInterceptor(role, table->role.useWorkstation, ev)) return;
                     } else if (legacyBlock.isLeverBlock()) {
                         if (applyRoleInterceptor(role, table->role.useLever, ev)) return;
                     } else if (vftable == BlastFurnaceBlock::$vftable() || vftable == FurnaceBlock::$vftable()
                                || vftable == SmokerBlock::$vftable()) {
                         if (applyRoleInterceptor(role, table->role.useFurnaces, ev)) return;
+                    } else if (vftable == BeaconBlock::$vftable()) {
+                        if (applyRoleInterceptor(role, table->role.useBeacon, ev)) return;
+                    } else if (vftable == BedBlock::$vftable()) {
+                        if (applyRoleInterceptor(role, table->role.useBed, ev)) return;
                     }
                     // fallback
                     if (auto entry = PermMapping::get().lookup<RolePerms::Entry>(block->getTypeName().data(), table)) {

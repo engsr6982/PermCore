@@ -9,7 +9,7 @@ struct EnvironmentPerms final {
     bool allowFireSpread;           // 火焰蔓延
     bool allowMonsterSpawn;         // 怪物生成
     bool allowAnimalSpawn;          // 动物生成
-    bool allowMobGrief;             // 实体破坏(破坏方块、拾取方块、放置方块)
+    bool allowMobGrief;             // 实体破坏(破坏方块/拾取方块/放置方块)
     bool allowExplode;              // 爆炸
     bool allowFarmDecay;            // 耕地退化
     bool allowPistonPushOnBoundary; // 活塞推动边界方块
@@ -42,16 +42,10 @@ struct RolePerms final {
     Entry allowInteractEntity{};    // 允许与实体交互 // TODO: 解决歧义：玩家交互实体 & 玩家取走栅栏上的拴绳实体
     Entry useTrapdoor{};            // 允许使用活板门
     Entry editSign{};               // 允许编辑告示牌
-    Entry useShulkerBox{};          // 允许使用潜影盒
-    Entry useCraftingTable{};       // 允许使用工作台
-    Entry useLever{};               // 允许使用拉杆 // TODO: 拉杆、按钮合并为 useRedstoneComponent ?
-    Entry useFurnaces{};            // 允许使用所有熔炉类方块（熔炉、高炉、烟熏炉）
-    Entry allowPlayerDamage{};      // 玩家受到伤害 (此权限通过PermMapping间接映射)
-    Entry allowHostileDamage{};     // 敌对生物受到伤害 (此权限通过PermMapping间接映射)
-    Entry allowFriendlyDamage{};    // 友好生物受到伤害 (此权限通过PermMapping间接映射)
-    Entry allowNeutralDamage{};     // 中立/特殊生物受到伤害 (此权限通过PermMapping间接映射)
+    Entry useLever{};               // 允许使用拉杆
+    Entry useFurnaces{};            // 允许使用所有熔炉类方块（熔炉/高炉/烟熏炉）
     Entry allowPlayerPickupItem{};  // 允许玩家拾取物品
-    Entry allowRideTrans{};         // 允许骑乘运输工具（矿车、船）
+    Entry allowRideTrans{};         // 允许骑乘运输工具（矿车/船）
     Entry allowRideEntity{};        // 允许骑乘实体
     Entry usePressurePlate{};       // 触发压力板
     Entry allowFishingRodAndHook{}; // 允许使用钓鱼竿和鱼钩
@@ -59,6 +53,32 @@ struct RolePerms final {
     Entry useArmorStand{};          // 允许使用盔甲架
     Entry allowDropItem{};          // 允许丢弃物品
     Entry useItemFrame{};           // 允许操作物品展示框
+    Entry useFlintAndSteel{};       // 使用打火石
+    Entry useBeacon{};              // 使用信标
+    Entry useBed{};                 // 使用床
+
+    // 以下权限均通过 PermMapping 动态映射
+    Entry allowPvP{};                 // 允许PvP
+    Entry allowHostileDamage{};       // 敌对生物受到伤害
+    Entry allowFriendlyDamage{};      // 友好生物受到伤害
+    Entry allowSpecialEntityDamage{}; // 特殊生物受到伤害
+    Entry useContainer{};             // 允许使用容器(箱子/木桶/潜影盒/发射器/投掷器/漏斗/雕纹书架/试炼宝库/...)
+    Entry useWorkstation{};           // 工作站类(工作台/铁砧/附魔台/酿造台/锻造台/砂轮/织布机/切石机/制图台/合成器)
+    Entry useBell{};                  // 使用钟
+    Entry useCampfire{};              // 使用营火
+    Entry useComposter{};             // 使用堆肥桶
+    Entry useDaylightDetector{};      // 使用阳光探测器
+    Entry useJukebox{};               // 使用唱片机
+    Entry useNoteBlock{};             // 使用音符盒
+    Entry useCake{};                  // 吃蛋糕
+    Entry useComparator{};            // 使用红石比较器
+    Entry useRepeater{};              // 使用红石中继器
+    Entry useLectern{};               // 使用讲台
+    Entry useCauldron{};              // 使用炼药锅
+    Entry useRespawnAnchor{};         // 使用重生锚
+    Entry useBoneMeal{};              // 使用骨粉
+    Entry useBeeNest{};               // 使用蜂巢(蜂箱)
+    Entry editFlowerPot{};            // 编辑花盆
 };
 
 struct PermTable final {

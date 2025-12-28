@@ -28,8 +28,6 @@ public:
     // init -> load -> ensure -> compile
     ll::Expected<> initTypeNameMapping(std::filesystem::path const& path);
 
-    optional_ref<FieldDescriptor> lookup(TypeName const& typeName) const;
-
     template <typename T>
     std::optional<T> lookup(TypeName const& typeName, PermTable* table) const {
         if (auto descriptor = lookup(typeName)) {
@@ -49,6 +47,8 @@ private:
     ll::Expected<> loadMapping(std::filesystem::path const& path);
     ll::Expected<> ensureMapping();
     ll::Expected<> compileFinalMapping();
+
+    optional_ref<FieldDescriptor> lookup(TypeName const& typeName) const;
 
 private:
     explicit PermMapping();
