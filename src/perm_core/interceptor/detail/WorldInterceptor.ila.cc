@@ -202,6 +202,48 @@ void PermInterceptor::registerIlaWorldInterceptor(ListenerConfig const& config) 
             applyDecision(delegate.postPolicy(blockSource, aabb), ev);
         });
     });
+
+    registerListenerIf(config.MossGrowthBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::MossGrowthBeforeEvent>([&](ila::mc::MossGrowthBeforeEvent& ev) {
+            auto& blockSource = ev.blockSource();
+            auto& blockPos    = ev.pos();
+            int   rx          = ev.xRadius();
+            int   rz          = ev.zRadius();
+
+            auto minPos = Vec3(blockPos.x - rx, blockPos.y - 1, blockPos.z - rz);
+            auto maxPos = Vec3(blockPos.x + rx + 1, blockPos.y + 2, blockPos.z + rz + 1);
+            AABB box(minPos, maxPos);
+
+            auto& delegate = getDelegate();
+            if (applyDecision(delegate.preCheck(blockSource, box), ev)) return;
+
+            auto iter = delegate.queryMatrix(blockSource, box);
+            for (auto& table : iter) {
+                bool result = table.environment.allowPlantGrowth;
+                if (!result) {
+                    if (applyDecision(result, ev)) return;
+                }
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, box), ev);
+        });
+    });
+
+    registerListenerIf(config.LiquidFlowBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::LiquidFlowBeforeEvent>([&](ila::mc::LiquidFlowBeforeEvent& ev) {
+            auto& blockSource = ev.blockSource();
+            auto& fromPos     = ev.flowFromPos(); // 源头 (水流来的方向)
+            auto& toPos       = ev.pos();         // 目标 (水流要去的地方)
+
+            auto& delegate = getDelegate();
+            if (applyDecision(delegate.preCheck(blockSource, toPos), ev)) return;
+
+            auto decision = delegate.handleLiquidFlow(blockSource, fromPos, toPos, &EnvironmentPerms::allowLiquidFlow);
+            if (applyDecision(decision, ev)) return;
+
+            applyDecision(delegate.postPolicy(blockSource, toPos), ev);
+        });
+    });
 }
 
 } // namespace permc

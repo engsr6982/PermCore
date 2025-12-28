@@ -16,6 +16,8 @@ struct EnvironmentPerms final {
     bool allowRedstoneUpdate;       // 红石更新
     bool allowBlockFall;            // 方块掉落
     bool allowWitherDestroy;        // 凋零破坏
+    bool allowPlantGrowth;          // 植物生长(苔藓蔓延)
+    bool allowLiquidFlow;           // 流动液体
 };
 
 struct RolePerms final {

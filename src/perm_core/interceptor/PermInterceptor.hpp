@@ -56,6 +56,8 @@ public:
         bool RedstoneUpdateBeforeEvent            = true; // ILA (env)
         bool BlockFallBeforeEvent                 = true; // ILA (env)
         bool WitherDestroyBeforeEvent             = true; // ILA (env)
+        bool MossGrowthBeforeEvent                = true; // ILA (env)
+        bool LiquidFlowBeforeEvent                = true; // ILA (env)
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
