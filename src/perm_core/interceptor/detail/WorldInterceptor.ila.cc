@@ -178,6 +178,30 @@ void PermInterceptor::registerIlaWorldInterceptor(ListenerConfig const& config) 
             applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
         });
     });
+
+    registerListenerIf(config.WitherDestroyBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::WitherDestroyBeforeEvent>([&](ila::mc::WitherDestroyBeforeEvent& ev) {
+            TRACE_THIS_EVENT(ila::mc::WitherDestroyBeforeEvent)
+
+            auto& blockSource = ev.blockSource();
+            auto& aabb        = ev.box();
+
+            TRACE_ADD_MESSAGE("aabb={}", aabb.toString());
+
+            auto& delegate = getDelegate();
+            if (applyDecision(delegate.preCheck(blockSource, aabb), ev)) return;
+
+            auto iter = delegate.queryMatrix(blockSource, aabb);
+            for (auto& table : iter) {
+                bool result = table.environment.allowWitherDestroy;
+                if (!result) {
+                    if (applyDecision(result, ev)) return;
+                }
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, aabb), ev);
+        });
+    });
 }
 
 } // namespace permc

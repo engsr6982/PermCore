@@ -15,6 +15,7 @@ struct EnvironmentPerms final {
     bool allowPistonPushOnBoundary; // 活塞推动边界方块
     bool allowRedstoneUpdate;       // 红石更新
     bool allowBlockFall;            // 方块掉落
+    bool allowWitherDestroy;        // 凋零破坏
 };
 
 struct RolePerms final {

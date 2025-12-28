@@ -6,6 +6,8 @@
 
 #include "ll/api/coro/Generator.h"
 
+#include <mc/world/phys/AABB.h>
+
 class AABB;
 class BlockPos;
 class Player;
@@ -24,6 +26,7 @@ struct InterceptorDelegate {
     virtual ~InterceptorDelegate() = default;
 
     virtual PermDecision preCheck(BlockSource& blockSource, BlockPos const& blockPos) = 0;
+    virtual PermDecision preCheck(BlockSource& blockSource, AABB const& aabb)         = 0;
 
     virtual PermRole getRole(Player& player, BlockSource& blockSource, BlockPos const& blockPos) = 0;
 
@@ -31,7 +34,8 @@ struct InterceptorDelegate {
 
     virtual ll::coro::Generator<PermTable const&> queryMatrix(BlockSource& blockSource, AABB const& aabb) = 0;
 
-    virtual PermDecision postPolicy(BlockSource& blockSource, BlockPos const& vec3) = 0;
+    virtual PermDecision postPolicy(BlockSource& blockSource, BlockPos const& blockPos) = 0;
+    virtual PermDecision postPolicy(BlockSource& blockSource, AABB const& aabb)         = 0;
 
     /**
      * @brief 活塞推拉检查

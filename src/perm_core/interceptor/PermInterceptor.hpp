@@ -55,6 +55,7 @@ public:
         bool PistonPushBeforeEvent                = true; // ILA (env)
         bool RedstoneUpdateBeforeEvent            = true; // ILA (env)
         bool BlockFallBeforeEvent                 = true; // ILA (env)
+        bool WitherDestroyBeforeEvent             = true; // ILA (env)
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
