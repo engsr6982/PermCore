@@ -31,6 +31,31 @@ struct MyInterceptorDelegate final : public permc::InterceptorDelegate {
     optional_ref<permc::PermTable> getPermTable(BlockSource& blockSource, const BlockPos& blockPos) override {
         return gPermTable;
     }
+    permc::PermDecision preCheck(BlockSource& blockSource, const AABB& aabb) override { return gPreDecision; }
+    ll::coro::Generator<permc::PermTable const&> queryMatrix(BlockSource& blockSource, const AABB& aabb) override {
+        co_yield gPermTable;
+    }
+    permc::PermDecision postPolicy(BlockSource& blockSource, const AABB& aabb) override { return gPostDecision; }
+    permc::PermDecision handlePistonAction(
+        BlockSource&    blockSource,
+        const BlockPos& pistonPos,
+        const BlockPos& pushPos,
+        bool permc::EnvironmentPerms::* field
+    ) override {
+        return permc::PermDecision::Abstain;
+    }
+    permc::PermDecision
+    handleBlockFall(BlockSource& blockSource, const BlockPos& fallPos, bool permc::EnvironmentPerms::* field) override {
+        return permc::PermDecision::Abstain;
+    }
+    permc::PermDecision handleSpread(
+        BlockSource&    source,
+        const BlockPos& fromPos,
+        const BlockPos& toPos,
+        bool permc::EnvironmentPerms::* field
+    ) override {
+        return permc::PermDecision::Abstain;
+    }
 };
 
 TestMod& TestMod::getInstance() {
