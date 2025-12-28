@@ -238,7 +238,57 @@ void PermInterceptor::registerIlaWorldInterceptor(ListenerConfig const& config) 
             auto& delegate = getDelegate();
             if (applyDecision(delegate.preCheck(blockSource, toPos), ev)) return;
 
-            auto decision = delegate.handleLiquidFlow(blockSource, fromPos, toPos, &EnvironmentPerms::allowLiquidFlow);
+            auto decision = delegate.handleSpread(blockSource, fromPos, toPos, &EnvironmentPerms::allowLiquidFlow);
+            if (applyDecision(decision, ev)) return;
+
+            applyDecision(delegate.postPolicy(blockSource, toPos), ev);
+        });
+    });
+
+    registerListenerIf(config.DragonEggBlockTeleportBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::DragonEggBlockTeleportBeforeEvent>(
+            [&](ila::mc::DragonEggBlockTeleportBeforeEvent& ev) {
+                auto& blockSource = ev.blockSource();
+                auto& blockPos    = ev.pos();
+
+                auto& delegate = getDelegate();
+                if (applyDecision(delegate.preCheck(blockSource, blockPos), ev)) return;
+
+                if (auto table = delegate.getPermTable(blockSource, blockPos)) {
+                    if (applyDecision(table->environment.allowDragonEggTeleport, ev)) return;
+                }
+
+                applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
+            }
+        );
+    });
+
+    registerListenerIf(config.SculkBlockGrowthBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::SculkBlockGrowthBeforeEvent>([&](ila::mc::SculkBlockGrowthBeforeEvent& ev) {
+            auto& blockSource = ev.blockSource();
+            auto& blockPos    = ev.pos();
+
+            auto& delegate = getDelegate();
+            if (applyDecision(delegate.preCheck(blockSource, blockPos), ev)) return;
+
+            if (auto table = delegate.getPermTable(blockSource, blockPos)) {
+                if (applyDecision(table->environment.allowSculkBlockGrowth, ev)) return;
+            }
+
+            applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
+        });
+    });
+
+    registerListenerIf(config.SculkSpreadBeforeEvent, [&]() {
+        return bus.emplaceListener<ila::mc::SculkSpreadBeforeEvent>([&](ila::mc::SculkSpreadBeforeEvent& ev) {
+            auto& blockSource = ev.blockSource();
+            auto& fromPos     = ev.selfPos();
+            auto& toPos       = ev.targetPos();
+
+            auto& delegate = getDelegate();
+            if (applyDecision(delegate.preCheck(blockSource, toPos), ev)) return;
+
+            auto decision = delegate.handleSpread(blockSource, fromPos, toPos, &EnvironmentPerms::allowSculkSpread);
             if (applyDecision(decision, ev)) return;
 
             applyDecision(delegate.postPolicy(blockSource, toPos), ev);

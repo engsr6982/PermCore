@@ -18,6 +18,9 @@ struct EnvironmentPerms final {
     bool allowWitherDestroy;        // 凋零破坏
     bool allowPlantGrowth;          // 植物生长(苔藓蔓延)
     bool allowLiquidFlow;           // 流动液体
+    bool allowDragonEggTeleport;    // 龙蛋传送
+    bool allowSculkBlockGrowth;     // 幽匿尖啸体生长
+    bool allowSculkSpread;          // 幽匿蔓延
 };
 
 struct RolePerms final {

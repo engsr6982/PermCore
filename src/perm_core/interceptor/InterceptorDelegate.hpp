@@ -55,7 +55,14 @@ struct InterceptorDelegate {
     virtual PermDecision
     handleBlockFall(BlockSource& blockSource, BlockPos const& fallPos, bool EnvironmentPerms::* field) = 0;
 
-    virtual PermDecision handleLiquidFlow(
+    /**
+     * @brief 处理方块蔓延/侵蚀 (幽匿蔓延、液体流动)
+     * @param source 方块源
+     * @param fromPos 源头
+     * @param toPos 目标
+     * @param field 对应的权限字段
+     */
+    virtual PermDecision handleSpread(
         BlockSource&    source,
         BlockPos const& fromPos,
         BlockPos const& toPos,

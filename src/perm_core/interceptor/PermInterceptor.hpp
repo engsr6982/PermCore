@@ -58,6 +58,9 @@ public:
         bool WitherDestroyBeforeEvent             = true; // ILA (env)
         bool MossGrowthBeforeEvent                = true; // ILA (env)
         bool LiquidFlowBeforeEvent                = true; // ILA (env)
+        bool DragonEggBlockTeleportBeforeEvent    = true; // ILA (env)
+        bool SculkBlockGrowthBeforeEvent          = true; // ILA (env)
+        bool SculkSpreadBeforeEvent               = true; // ILA (env)
     };
 
     explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
