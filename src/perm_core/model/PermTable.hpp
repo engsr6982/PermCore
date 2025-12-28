@@ -16,7 +16,7 @@ struct EnvironmentPerms final {
     bool allowRedstoneUpdate;       // 红石更新
     bool allowBlockFall;            // 方块掉落
     bool allowWitherDestroy;        // 凋零破坏
-    bool allowPlantGrowth;          // 植物生长(苔藓蔓延)
+    bool allowMossGrowth;           // 苔藓生长(蔓延)
     bool allowLiquidFlow;           // 流动液体
     bool allowDragonEggTeleport;    // 龙蛋传送
     bool allowSculkBlockGrowth;     // 幽匿尖啸体生长

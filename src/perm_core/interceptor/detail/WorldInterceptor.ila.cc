@@ -219,7 +219,7 @@ void PermInterceptor::registerIlaWorldInterceptor(ListenerConfig const& config) 
 
             auto iter = delegate.queryMatrix(blockSource, box);
             for (auto& table : iter) {
-                bool result = table.environment.allowPlantGrowth;
+                bool result = table.environment.allowMossGrowth;
                 if (!result) {
                     if (applyDecision(result, ev)) return;
                 }
