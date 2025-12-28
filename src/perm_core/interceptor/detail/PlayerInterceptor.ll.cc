@@ -124,7 +124,7 @@ void PermInterceptor::registerLLPlayerInterceptor(ListenerConfig const& config) 
                     if (vftable == BucketItem::$vftable()) {
                         if (applyRoleInterceptor(role, table->role.useBucket, ev)) return;
                     } else if (item->hasTag(VanillaItemTags::Hatchet())) {
-                        if (applyRoleInterceptor(role, table->role.allowAxePeeled, ev)) return;
+                        if (applyRoleInterceptor(role, table->role.useAxe, ev)) return;
                     } else if (item->hasTag(VanillaItemTags::Hoe())) {
                         if (applyRoleInterceptor(role, table->role.useHoe, ev)) return;
                     } else if (item->hasTag(VanillaItemTags::Shovel())) {

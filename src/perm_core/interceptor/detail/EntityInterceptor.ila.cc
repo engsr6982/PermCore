@@ -46,7 +46,7 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
             if (applyDecision(decision, ev)) return;
 
             if (auto table = delegate.getPermTable(blockSource, blockPos)) {
-                if (applyDecision(table->environment.allowActorDestroy, ev)) return;
+                if (applyDecision(table->environment.allowMobGrief, ev)) return;
             }
 
             applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
@@ -69,7 +69,7 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
             if (applyDecision(decision, ev)) return;
 
             if (auto table = delegate.getPermTable(blockSource, blockPos)) {
-                if (applyDecision(table->environment.allowActorDestroy, ev)) return;
+                if (applyDecision(table->environment.allowMobGrief, ev)) return;
             }
 
             applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
@@ -92,7 +92,7 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
             if (applyDecision(decision, ev)) return;
 
             if (auto table = delegate.getPermTable(blockSource, blockPos)) {
-                if (applyDecision(table->environment.allowActorDestroy, ev)) return;
+                if (applyDecision(table->environment.allowMobGrief, ev)) return;
             }
 
             applyDecision(delegate.postPolicy(blockSource, blockPos), ev);
