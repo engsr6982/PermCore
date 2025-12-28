@@ -53,8 +53,6 @@ void PermInterceptor::registerIlaPlayerInterceptor(ListenerConfig const& config)
         );
     });
 
-    // TODO: 验证移除 PlayerAttackBlockBeforeEvent 事件对 allowAttackDragonEgg 权限的影响
-
     registerListenerIf(config.ArmorStandSwapItemBeforeEvent, [&]() {
         return bus.emplaceListener<ila::mc::ArmorStandSwapItemBeforeEvent>(
             [&](ila::mc::ArmorStandSwapItemBeforeEvent& ev) {
