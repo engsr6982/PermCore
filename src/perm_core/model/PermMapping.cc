@@ -103,6 +103,24 @@ void PermMapping::initDefaultMapping() {
     REQUIRE_PERM_FIELD(allowSpecialEntityDamage);
     REQUIRE_PERM_FIELD(allowPlace);
     REQUIRE_PERM_FIELD(useBoneMeal);
+    REQUIRE_PERM_FIELD(useContainer);
+    REQUIRE_PERM_FIELD(useCampfire);
+    REQUIRE_PERM_FIELD(useComposter);
+    REQUIRE_PERM_FIELD(useNoteBlock);
+    REQUIRE_PERM_FIELD(useJukebox);
+    REQUIRE_PERM_FIELD(useBell);
+    REQUIRE_PERM_FIELD(useDaylightDetector);
+    REQUIRE_PERM_FIELD(useLectern);
+    REQUIRE_PERM_FIELD(useCauldron);
+    REQUIRE_PERM_FIELD(useRespawnAnchor);
+    REQUIRE_PERM_FIELD(editFlowerPot);
+    REQUIRE_PERM_FIELD(allowDestroy);
+    REQUIRE_PERM_FIELD(useWorkstation);
+    REQUIRE_PERM_FIELD(useBeacon);
+    REQUIRE_PERM_FIELD(useCake);
+    REQUIRE_PERM_FIELD(useComparator);
+    REQUIRE_PERM_FIELD(useRepeater);
+    REQUIRE_PERM_FIELD(useBeeNest);
     impl_->typeMapping_ = {
         /*实体关联权限*/
         {"minecraft:player",                     "allowPvP"                }, // 玩家
