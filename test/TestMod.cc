@@ -74,7 +74,7 @@ bool TestMod::load() {
 
 bool TestMod::enable() {
 
-    static permc::PermInterceptor::InterceptorConfig config;
+    static permc::InterceptorConfig config;
 
     auto delegate = std::make_unique<MyInterceptorDelegate>();
     interceptor_  = std::make_unique<permc::PermInterceptor>(std::move(delegate), config);
