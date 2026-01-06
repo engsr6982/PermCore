@@ -23,7 +23,7 @@
 
 namespace permc {
 
-void PermInterceptor::registerIlaWorldInterceptor(ListenerConfig const& config) {
+void PermInterceptor::registerIlaWorldInterceptor(InterceptorConfig::ListenerConfig const& config) {
     auto& bus = ll::event::EventBus::getInstance();
 
     registerListenerIf(config.ExplosionBeforeEvent, [&]() {

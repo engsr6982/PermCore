@@ -28,7 +28,7 @@
 
 namespace permc {
 
-void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config) {
+void PermInterceptor::registerIlaEntityInterceptor(InterceptorConfig::ListenerConfig const& config) {
     auto& bus = ll::event::EventBus::getInstance();
     registerListenerIf(config.ActorDestroyBlockEvent, [&]() {
         return bus.emplaceListener<ila::mc::ActorDestroyBlockEvent>([&](ila::mc::ActorDestroyBlockEvent& ev) {

@@ -66,6 +66,7 @@ TestMod& TestMod::getInstance() {
 bool TestMod::load() {
     if (auto exp = permc::PermMapping::get().initTypeNameMapping(getSelf().getConfigDir() / "PermMapping.json"); !exp) {
         exp.error().log(getSelf().getLogger());
+        return false;
     }
 
     return true;
@@ -73,7 +74,7 @@ bool TestMod::load() {
 
 bool TestMod::enable() {
 
-    static permc::PermInterceptor::ListenerConfig config;
+    static permc::PermInterceptor::InterceptorConfig config;
 
     auto delegate = std::make_unique<MyInterceptorDelegate>();
     interceptor_  = std::make_unique<permc::PermInterceptor>(std::move(delegate), config);

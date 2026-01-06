@@ -1,4 +1,5 @@
 #pragma once
+#include "InterceptorConfig.hpp"
 #include "InterceptorDelegate.hpp"
 
 #include <ll/api/event/ListenerBase.h>
@@ -29,41 +30,7 @@ class PermInterceptor final {
     std::unique_ptr<Impl> impl;
 
 public:
-    struct ListenerConfig {
-        bool PlayerDestroyBlockEvent              = true; // LL
-        bool PlayerPlacingBlockEvent              = true; // LL
-        bool PlayerInteractBlockEvent             = true; // LL
-        bool PlayerAttackEvent                    = true; // LL
-        bool PlayerPickUpItemEvent                = true; // LL
-        bool SpawnedMobEvent                      = true; // LL (env)
-        bool ActorHurtEvent                       = true; // LL
-        bool FireSpreadEvent                      = true; // LL (env)
-        bool ActorDestroyBlockEvent               = true; // ILA (env)
-        bool MobTakeBlockBeforeEvent              = true; // ILA (env)
-        bool MobPlaceBlockBeforeEvent             = true; // ILA (env)
-        bool ActorRideBeforeEvent                 = true; // ILA
-        bool MobHurtEffectBeforeEvent             = true; // ILA
-        bool ActorTriggerPressurePlateBeforeEvent = true; // ILA
-        bool ProjectileCreateBeforeEvent          = true; // ILA
-        bool PlayerInteractEntityBeforeEvent      = true; // ILA
-        bool ArmorStandSwapItemBeforeEvent        = true; // ILA
-        bool PlayerDropItemBeforeEvent            = true; // ILA
-        bool PlayerOperatedItemFrameBeforeEvent   = true; // ILA
-        bool PlayerEditSignBeforeEvent            = true; // ILA
-        bool ExplosionBeforeEvent                 = true; // ILA (env)
-        bool FarmDecayBeforeEvent                 = true; // ILA (env)
-        bool PistonPushBeforeEvent                = true; // ILA (env)
-        bool RedstoneUpdateBeforeEvent            = true; // ILA (env)
-        bool BlockFallBeforeEvent                 = true; // ILA (env)
-        bool WitherDestroyBeforeEvent             = true; // ILA (env)
-        bool MossGrowthBeforeEvent                = true; // ILA (env)
-        bool LiquidFlowBeforeEvent                = true; // ILA (env)
-        bool DragonEggBlockTeleportBeforeEvent    = true; // ILA (env)
-        bool SculkBlockGrowthBeforeEvent          = true; // ILA (env)
-        bool SculkSpreadBeforeEvent               = true; // ILA (env)
-    };
-
-    explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config);
+    explicit PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, InterceptorConfig const& config);
     ~PermInterceptor();
 
     [[nodiscard]] InterceptorDelegate&       getDelegate();
@@ -75,13 +42,13 @@ private:
     void registerListener(ll::event::ListenerPtr listener);
 
     // detail
-    void registerLLPlayerInterceptor(ListenerConfig const& config);
-    void registerLLEntityInterceptor(ListenerConfig const& config);
-    void registerLLWorldInterceptor(ListenerConfig const& config);
+    void registerLLPlayerInterceptor(InterceptorConfig::ListenerConfig const& config);
+    void registerLLEntityInterceptor(InterceptorConfig::ListenerConfig const& config);
+    void registerLLWorldInterceptor(InterceptorConfig::ListenerConfig const& config);
 
-    void registerIlaEntityInterceptor(ListenerConfig const& config);
-    void registerIlaPlayerInterceptor(ListenerConfig const& config);
-    void registerIlaWorldInterceptor(ListenerConfig const& config);
+    void registerIlaEntityInterceptor(InterceptorConfig::ListenerConfig const& config);
+    void registerIlaPlayerInterceptor(InterceptorConfig::ListenerConfig const& config);
+    void registerIlaWorldInterceptor(InterceptorConfig::ListenerConfig const& config);
 };
 
 } // namespace permc
