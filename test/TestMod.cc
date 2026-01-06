@@ -17,7 +17,7 @@
 
 namespace test {
 
-static permc::PermRole     gRole{permc::PermRole::Gust};
+static permc::PermRole     gRole{permc::PermRole::Guest};
 static permc::PermTable    gPermTable{};
 static permc::PermDecision gPreDecision{permc::PermDecision::Abstain};
 static permc::PermDecision gPostDecision{permc::PermDecision::Allow};
