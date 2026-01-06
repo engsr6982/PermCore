@@ -18,6 +18,8 @@ PermInterceptor::PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, 
     registerLLWorldInterceptor(config.listeners_);
 
     registerIlaEntityInterceptor(config.listeners_);
+    registerIlaPlayerInterceptor(config.listeners_);
+    registerIlaWorldInterceptor(config.listeners_);
 }
 PermInterceptor::~PermInterceptor() {
     auto& bus = ll::event::EventBus::getInstance();
