@@ -17,9 +17,9 @@ target("PermCore") -- Change this to your mod name.
     set_kind("static")
     set_languages("c++20")
     set_symbols("debug")
-    add_headerfiles("src/(perm_core/**.hpp)")
-    add_files("src/**.cc")
-    add_includedirs("src")
+    add_headerfiles("./src/(perm_core/**.hpp)")
+    add_files("./src/**.cc")
+    add_includedirs("./src")
     add_defines("FMT_HEADER_ONLY=1") -- fix ODR errors
     if is_mode("debug") then
         add_defines("PERMC_DEBUG")
