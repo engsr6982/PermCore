@@ -7,6 +7,7 @@
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeEnum.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
+#include "ll/api/i18n/I18n.h"
 #include "ll/api/mod/RegisterHelper.h"
 
 #include "perm_core/interceptor/InterceptorDelegate.hpp"
@@ -64,6 +65,10 @@ TestMod& TestMod::getInstance() {
 }
 
 bool TestMod::load() {
+    if (auto exp = ll::i18n::getInstance().load(getSelf().getLangDir()); !exp) {
+        exp.error().log(getSelf().getLogger());
+    }
+
     if (auto exp = permc::PermMapping::get().initTypeNameMapping(getSelf().getConfigDir() / "PermMapping.json"); !exp) {
         exp.error().log(getSelf().getLogger());
         return false;
