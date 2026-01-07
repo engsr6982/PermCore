@@ -8,6 +8,10 @@ add_requires("ilistenattentively 0.10.0")
 
 add_requires("levibuildscript")
 
+if not has_config("vs_runtime") then
+    set_runtimes("MD")
+end
+
 target("PermCore") -- Change this to your mod name.
     add_rules("@levibuildscript/linkrule")
     add_cxflags( "/EHa", "/utf-8", "/W4", "/w44265", "/w44289", "/w44296", "/w45263", "/w44738", "/w45204")

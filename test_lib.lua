@@ -26,3 +26,14 @@ target("PermCoreTest")
     add_files("./test/**.cc")
     add_includedirs("./test", "./src")
     add_defines("FMT_HEADER_ONLY=1") -- fix ODR errors
+        after_build(function(target)
+        local project_dir =  os.projectdir()
+        local assets_dir = path.join(project_dir, "assets")
+        local lang_assets_dir = path.join(assets_dir, "lang")
+
+        local bin_dir = path.join(project_dir, "bin")
+        local lang_bin_dir = path.join(bin_dir, target:name(), "lang")
+
+        os.mkdir(lang_bin_dir)
+        os.cp(path.join(lang_assets_dir, "**"), lang_bin_dir)
+    end)
