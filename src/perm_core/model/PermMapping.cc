@@ -103,6 +103,24 @@ void PermMapping::initDefaultMapping() {
     REQUIRE_PERM_FIELD(allowSpecialEntityDamage);
     REQUIRE_PERM_FIELD(allowPlace);
     REQUIRE_PERM_FIELD(useBoneMeal);
+    REQUIRE_PERM_FIELD(useContainer);
+    REQUIRE_PERM_FIELD(useCampfire);
+    REQUIRE_PERM_FIELD(useComposter);
+    REQUIRE_PERM_FIELD(useNoteBlock);
+    REQUIRE_PERM_FIELD(useJukebox);
+    REQUIRE_PERM_FIELD(useBell);
+    REQUIRE_PERM_FIELD(useDaylightDetector);
+    REQUIRE_PERM_FIELD(useLectern);
+    REQUIRE_PERM_FIELD(useCauldron);
+    REQUIRE_PERM_FIELD(useRespawnAnchor);
+    REQUIRE_PERM_FIELD(editFlowerPot);
+    REQUIRE_PERM_FIELD(allowDestroy);
+    REQUIRE_PERM_FIELD(useWorkstation);
+    REQUIRE_PERM_FIELD(useBeacon);
+    REQUIRE_PERM_FIELD(useCake);
+    REQUIRE_PERM_FIELD(useComparator);
+    REQUIRE_PERM_FIELD(useRepeater);
+    REQUIRE_PERM_FIELD(useBeeNest);
     impl_->typeMapping_ = {
         /*实体关联权限*/
         {"minecraft:player",                     "allowPvP"                }, // 玩家
@@ -165,7 +183,6 @@ void PermMapping::initDefaultMapping() {
         {"minecraft:boat",                       "allowSpecialEntityDamage"}, // 船
         {"minecraft:ender_crystal",              "allowSpecialEntityDamage"}, // 末影水晶
 
-        // TODO: 验证下列映射权限有效 & 无无用关联
         /*特殊物品/方块关联权限(此类物品/方块仅在与其它方块交互时触发)*/
         /*物品关联*/
         {"minecraft:skull",                      "allowPlace"              }, // 头颅
@@ -176,8 +193,8 @@ void PermMapping::initDefaultMapping() {
         {"minecraft:armor_stand",                "allowPlace"              }, // 盔甲架
         {"minecraft:bone_meal",                  "useBoneMeal"             }, // 骨粉
         /*特殊方块关联*/
-        {"minecraft:chest",                      "allowOpenChest"          }, // 箱子
-        {"minecraft:trapped_chest",              "allowOpenChest"          }, // 漏斗箱
+        {"minecraft:chest",                      "useContainer"            }, // 箱子
+        {"minecraft:trapped_chest",              "useContainer"            }, // 漏斗箱
         {"minecraft:campfire",                   "useCampfire"             }, // 营火
         {"minecraft:soul_campfire",              "useCampfire"             }, // 灵魂营火
         {"minecraft:composter",                  "useComposter"            }, // 堆肥桶
@@ -191,22 +208,23 @@ void PermMapping::initDefaultMapping() {
         {"minecraft:respawn_anchor",             "useRespawnAnchor"        }, // 重生锚
         {"minecraft:flower_pot",                 "editFlowerPot"           }, // 花盆
         {"minecraft:sweet_berry_bush",           "allowDestroy"            }, // 甜莓丛
-        /*功能类方块关联*/
-        {"minecraft:cartography_table",          "useCartographyTable"     }, // 制图台
-        {"minecraft:smithing_table",             "useSmithingTable"        }, // 锻造台
-        {"minecraft:brewing_stand",              "useBrewingStand"         }, // 酿造台
-        {"minecraft:anvil",                      "useAnvil"                }, // 铁砧
-        {"minecraft:grindstone",                 "useGrindstone"           }, // 砂轮
-        {"minecraft:enchanting_table",           "useEnchantingTable"      }, // 附魔台
-        {"minecraft:barrel",                     "useBarrel"               }, // 木桶/存储桶
+        /*功能类方块关联（合并至 useWorkstation / useContainer）*/
+        {"minecraft:cartography_table",          "useWorkstation"          }, // 制图台
+        {"minecraft:smithing_table",             "useWorkstation"          }, // 锻造台
+        {"minecraft:brewing_stand",              "useWorkstation"          }, // 酿造台
+        {"minecraft:anvil",                      "useWorkstation"          }, // 铁砧
+        {"minecraft:grindstone",                 "useWorkstation"          }, // 砂轮
+        {"minecraft:enchanting_table",           "useWorkstation"          }, // 附魔台
+        {"minecraft:loom",                       "useWorkstation"          }, // 织布机
+        {"minecraft:stonecutter_block",          "useWorkstation"          }, // 切石机
+        {"minecraft:crafter",                    "useWorkstation"          }, // 合成器
+        {"minecraft:chiseled_bookshelf",         "useContainer"            }, // 雕纹书架
+        {"minecraft:barrel",                     "useContainer"            }, // 木桶/存储桶
+        {"minecraft:hopper",                     "useContainer"            }, // 漏斗
+        {"minecraft:dropper",                    "useContainer"            }, // 投掷器
+        {"minecraft:dispenser",                  "useContainer"            }, // 发射器
+        {"minecraft:vault",                      "useContainer"            }, // 宝库
         {"minecraft:beacon",                     "useBeacon"               }, // 信标
-        {"minecraft:hopper",                     "useHopper"               }, // 漏斗
-        {"minecraft:dropper",                    "useDropper"              }, // 投掷器
-        {"minecraft:dispenser",                  "useDispenser"            }, // 发射器
-        {"minecraft:loom",                       "useLoom"                 }, // 织布机
-        {"minecraft:stonecutter_block",          "useStonecutter"          }, // 切石机
-        {"minecraft:crafter",                    "useCrafter"              }, // 合成器
-        {"minecraft:chiseled_bookshelf",         "useChiseledBookshelf"    }, // 雕纹书架
         {"minecraft:cake",                       "useCake"                 }, // 蛋糕
         {"minecraft:unpowered_comparator",       "useComparator"           }, // 红石比较器（未充能）
         {"minecraft:powered_comparator",         "useComparator"           }, // 红石比较器（充能）
@@ -214,7 +232,6 @@ void PermMapping::initDefaultMapping() {
         {"minecraft:powered_repeater",           "useRepeater"             }, // 红石中继器（充能）
         {"minecraft:bee_nest",                   "useBeeNest"              }, // 蜂巢
         {"minecraft:beehive",                    "useBeeNest"              }, // 蜂箱
-        {"minecraft:vault",                      "useVault"                }, // 宝库
     };
 }
 ll::Expected<> PermMapping::loadMapping(std::filesystem::path const& path) {

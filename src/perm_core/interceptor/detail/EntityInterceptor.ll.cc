@@ -16,7 +16,7 @@
 namespace permc {
 
 
-void PermInterceptor::registerLLEntityInterceptor(ListenerConfig const& config) {
+void PermInterceptor::registerLLEntityInterceptor(InterceptorConfig::ListenerConfig const& config) {
     auto& bus = ll::event::EventBus::getInstance();
     registerListenerIf(config.SpawnedMobEvent, [&]() {
         return bus.emplaceListener<ll::event::SpawnedMobEvent>([&](ll::event::SpawnedMobEvent& ev) {

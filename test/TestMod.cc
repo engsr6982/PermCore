@@ -7,6 +7,7 @@
 #include "ll/api/command/runtime/RuntimeCommand.h"
 #include "ll/api/command/runtime/RuntimeEnum.h"
 #include "ll/api/command/runtime/RuntimeOverload.h"
+#include "ll/api/i18n/I18n.h"
 #include "ll/api/mod/RegisterHelper.h"
 
 #include "perm_core/interceptor/InterceptorDelegate.hpp"
@@ -17,7 +18,7 @@
 
 namespace test {
 
-static permc::PermRole     gRole{permc::PermRole::Gust};
+static permc::PermRole     gRole{permc::PermRole::Guest};
 static permc::PermTable    gPermTable{};
 static permc::PermDecision gPreDecision{permc::PermDecision::Abstain};
 static permc::PermDecision gPostDecision{permc::PermDecision::Allow};
@@ -64,8 +65,13 @@ TestMod& TestMod::getInstance() {
 }
 
 bool TestMod::load() {
+    if (auto exp = ll::i18n::getInstance().load(getSelf().getLangDir()); !exp) {
+        exp.error().log(getSelf().getLogger());
+    }
+
     if (auto exp = permc::PermMapping::get().initTypeNameMapping(getSelf().getConfigDir() / "PermMapping.json"); !exp) {
         exp.error().log(getSelf().getLogger());
+        return false;
     }
 
     return true;
@@ -73,7 +79,7 @@ bool TestMod::load() {
 
 bool TestMod::enable() {
 
-    static permc::PermInterceptor::ListenerConfig config;
+    static permc::InterceptorConfig config;
 
     auto delegate = std::make_unique<MyInterceptorDelegate>();
     interceptor_  = std::make_unique<permc::PermInterceptor>(std::move(delegate), config);

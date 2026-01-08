@@ -16,7 +16,7 @@
 
 namespace permc {
 
-void PermInterceptor::registerIlaPlayerInterceptor(ListenerConfig const& config) {
+void PermInterceptor::registerIlaPlayerInterceptor(InterceptorConfig::ListenerConfig const& config) {
     auto& bus = ll::event::EventBus::getInstance();
 
     registerListenerIf(config.PlayerInteractEntityBeforeEvent, [&]() {

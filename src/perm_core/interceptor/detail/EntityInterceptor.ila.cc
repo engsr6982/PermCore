@@ -28,7 +28,7 @@
 
 namespace permc {
 
-void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config) {
+void PermInterceptor::registerIlaEntityInterceptor(InterceptorConfig::ListenerConfig const& config) {
     auto& bus = ll::event::EventBus::getInstance();
     registerListenerIf(config.ActorDestroyBlockEvent, [&]() {
         return bus.emplaceListener<ila::mc::ActorDestroyBlockEvent>([&](ila::mc::ActorDestroyBlockEvent& ev) {
@@ -198,7 +198,7 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
                 TRACE_STEP_PRE_CHECK(decision);
                 if (applyDecision(decision, ev)) return;
 
-                auto role = PermRole::Gust;
+                auto role = PermRole::Guest;
                 if (isPlayer) {
                     auto& player = static_cast<Player&>(actor);
                     role         = delegate.getRole(player, blockSource, blockPos);
@@ -288,7 +288,7 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
                 break;
             }
 
-            auto role = PermRole::Gust;
+            auto role = PermRole::Guest;
             if (ownerIsPlayer) {
                 auto& player = static_cast<Player&>(*owner);
                 role         = delegate.getRole(player, blockSource, blockPos);
@@ -300,7 +300,7 @@ void PermInterceptor::registerIlaEntityInterceptor(ListenerConfig const& config)
                 if (projectile.isType(ActorType::FishingHook)) {
                     if (applyRoleInterceptor(role, table->role.allowFishingRodAndHook, ev)) return;
                 } else {
-                    if ((role == PermRole::Gust && table->role.allowProjectileCreate.guest)
+                    if ((role == PermRole::Guest && table->role.allowProjectileCreate.guest)
                         || (role == PermRole::Member && table->role.allowProjectileCreate.member)) {
                         return;
                     }

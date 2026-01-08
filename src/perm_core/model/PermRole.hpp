@@ -6,7 +6,7 @@ enum class PermRole {
     Admin  = 0, // 全局管理员
     Owner  = 1, // 主人
     Member = 2, // 成员
-    Gust   = 3  // 游客
+    Guest   = 3  // 游客
 };
 
 }

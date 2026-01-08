@@ -9,15 +9,17 @@ struct PermInterceptor::Impl {
     std::vector<ll::event::ListenerPtr>  listeners;
 };
 
-PermInterceptor::PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, ListenerConfig const& config)
+PermInterceptor::PermInterceptor(std::unique_ptr<InterceptorDelegate> delegate, InterceptorConfig const& config)
 : impl(std::make_unique<Impl>()) {
     impl->delegate = std::move(delegate);
 
-    registerLLPlayerInterceptor(config);
-    registerLLEntityInterceptor(config);
-    registerLLWorldInterceptor(config);
+    registerLLPlayerInterceptor(config.listeners_);
+    registerLLEntityInterceptor(config.listeners_);
+    registerLLWorldInterceptor(config.listeners_);
 
-    registerIlaEntityInterceptor(config);
+    registerIlaEntityInterceptor(config.listeners_);
+    registerIlaPlayerInterceptor(config.listeners_);
+    registerIlaWorldInterceptor(config.listeners_);
 }
 PermInterceptor::~PermInterceptor() {
     auto& bus = ll::event::EventBus::getInstance();
