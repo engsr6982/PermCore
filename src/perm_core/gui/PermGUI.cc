@@ -22,13 +22,15 @@ void PermGUI::sendTo(Player& player, DataCtx::Ptr ctx) {
 
     auto f = ll::form::SimpleForm{};
     f.setTitle("Perm - 权限管理"_trl(localeCode));
-    f.appendButton("环境权限"_trl(localeCode), [ctx](Player& player) {
+    f.appendButton("环境权限"_trl(localeCode), "textures/ui/icon_recipe_nature", "path", [ctx](Player& player) {
         sendEditView(player, EditTarget::Environment, ctx);
     });
-    f.appendButton("成员权限"_trl(localeCode), [ctx](Player& player) {
+    f.appendButton("成员权限"_trl(localeCode), "textures/ui/permissions_member_star", "path", [ctx](Player& player) {
         sendEditView(player, EditTarget::Member, ctx);
     });
-    f.appendButton("游客权限"_trl(localeCode), [ctx](Player& player) { sendEditView(player, EditTarget::Guest, ctx); });
+    f.appendButton("游客权限"_trl(localeCode), "textures/ui/permissions_visitor_hand", "path", [ctx](Player& player) {
+        sendEditView(player, EditTarget::Guest, ctx);
+    });
     if (ctx->back) f.appendButton("返回"_trl(localeCode), [ctx](Player& player) { ctx->back(player); });
     f.sendTo(player);
 }
