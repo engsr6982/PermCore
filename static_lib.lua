@@ -27,4 +27,5 @@ target("PermCore") -- Change this to your mod name.
     add_defines("FMT_HEADER_ONLY=1") -- fix ODR errors
     if is_mode("debug") then
         add_defines("PERMC_DEBUG")
+        add_defines("PERMC_INTERCEPTOR_TRACE")
     end
