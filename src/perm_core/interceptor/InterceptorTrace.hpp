@@ -8,7 +8,7 @@
 
 namespace permc {
 
-#define PERMC_INTERCEPTOR_TRACE
+// #define PERMC_INTERCEPTOR_TRACE
 
 inline constexpr bool kInterceptorTraceEnabled =
 #ifdef PERMC_INTERCEPTOR_TRACE
